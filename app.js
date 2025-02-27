@@ -23,10 +23,15 @@ var app = express();
 
 const mongoURI =  process.env.MongoDB_url
 
-mongoose.connect(mongoURI)
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.log('MongoDB connection error: ', err));
-
+mongoose.connect(mongoURI, {
+  serverSelectionTimeoutMS: 30000,  // Increase timeout to 30 seconds
+})
+.then(() => {
+  console.log('Connected to MongoDB');
+})
+.catch((error) => {
+  console.error('Error connecting to MongoDB:', error);
+});
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 

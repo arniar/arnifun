@@ -287,7 +287,7 @@ exports.getCheckoutPage = async (req, res) => {
         const userId = req.session.userId;
         const cart = await Cart.findOne({ user: userId });
         const wallet = await Wallet.findOne({ user: userId });
-        req.session.discount=req.query.discount
+        req.session.discount=req.query.discount || 0;
         
         let discount = req.query.discount || 0;
         
