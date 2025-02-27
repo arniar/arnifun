@@ -1,0 +1,359 @@
+/* Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.login-container {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Login Box */
+.login-box {
+    display: flex;
+    flex-direction: row;
+    color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 700px;
+    width: 90%;
+    position: relative;
+    min-height: 400px; /* Set minimum height for the login box */
+    backdrop-filter: blur(10px); /* Apply blur effect */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Add a subtle border for depth */
+}
+
+/* Logo Section */
+.logo-section {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+.logo-section img {
+    width: 50px;
+    height: auto;
+}
+
+/* Image Section */
+.image-section {
+    flex: 1;
+    background: #000; 
+    justify-content: center;
+    align-items: flex-start; 
+    position: relative;
+}
+
+.image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: top center; 
+}
+
+/* Form Section */
+.form-section {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #252525; 
+    height: 100%; 
+}
+
+/* Form Header */
+.form-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #fff;
+}
+
+/* Input Fields */
+.form-section input,
+.form-section button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px; 
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #333;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.form-section button {
+    background-color: #D7A54E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-section button:hover {
+    background-color: #EBCB92;
+}
+
+/* Form Links (Terms & Privacy) */
+.form-links {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.form-links a {
+    text-decoration: none;
+    color: #D7A54E;
+    font-weight: bold;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+.form-links span {
+    margin: 0 5px;
+    color: #fff;
+}
+
+/* Social Login Buttons */
+.social-login {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.social-login p {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.social-login button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.social-login .google {
+    background-color: #db4437;
+    color: #fff;
+}
+
+.social-login .facebook {
+    background-color: #4267b2;
+    color: #fff;
+}
+
+.social-login button i {
+    font-size: 16px;
+}
+
+/* Link to Login Page */
+.login-link {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.login-link a {
+    text-decoration: none;
+    color: #D7A54E;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Password Wrapper */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 35px; 
+}
+
+.password-wrapper i {
+    position: absolute;
+    right: 10px; 
+    top: 20px;
+    transform: translateY(-50%); 
+    cursor: pointer;
+    color: #aaa;
+}
+
+.password-wrapper i:hover {
+    color: #D7A54E; 
+}
+
+/* Validation Messages */
+.iAfter {
+    border: 2px solid red !important;
+}
+
+.validation {
+    margin-top: 0;
+    margin-left: 5px;
+    font-size: 12px; 
+}
+
+.iValid {
+    color: red !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-box {
+        flex-direction: column;
+    }
+    .image-section {
+        height: 250px;
+        display: none;
+    }
+
+    .image-section img {
+        object-position: top center;
+        height: 22vh;
+    }
+
+    .form-section input,
+    .form-section button {
+        padding: 8px; 
+        font-size: 12px; 
+    }
+
+    .form-section h2 {
+        font-size: 20px; 
+    }
+
+    .social-login button {
+        font-size: 12px; 
+        padding: 8px 12px;
+    }
+
+    .password-wrapper i {
+        position: absolute;
+        right: 10px; 
+        top: 16px;
+        transform: translateY(-50%); 
+        cursor: pointer;
+        color: #aaa;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .image-section {
+        height: 0px; 
+        display: none;
+    }
+
+    .image-section img {
+        object-position: top center; 
+    }
+
+    .form-section input,
+    .form-section button {
+        padding: 6px; 
+        font-size: 12px;
+    }
+
+    .form-section h2 {
+        font-size: 18px; 
+    }
+
+    .social-login button {
+        font-size: 10px; 
+        padding: 6px 10px;
+    }
+
+    .password-wrapper i {
+        position: absolute;
+        right: 10px;
+        top: 16px;
+        transform: translateY(-50%); 
+        cursor: pointer;
+        color: #aaa;
+    }
+}
+
+.btn {
+    text-decoration: none !important;
+}
+/* Password Criteria Checklist */
+.password-criteria {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #aaa;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.password-criteria.visible {
+    opacity: 1;
+    max-height: 200px; /* Adjust based on content height */
+}
+
+.password-criteria ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.password-criteria li {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+}
+
+.password-criteria li::before {
+    content: '✗';
+    color: #ff4444;
+    margin-right: 8px;
+}
+
+.password-criteria li.valid::before {
+    content: '✓';
+    color: #00C851;
+}

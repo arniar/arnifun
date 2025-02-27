@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details</title>
+    <link rel="stylesheet" href="/stylesheets/admin/users.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        .swal2-popup {
+        background: var(--card-dark) !important;
+        color: var(--text-light) !important;
+        border: 1px solid var(--border-dark);
+    }
+    
+    .swal2-title, .swal2-html-container {
+        color: var(--text-light) !important;
+    }
+    
+    .swal2-confirm {
+        background: var(--primary-color) !important;
+    }
+    
+    .swal2-cancel {
+        background: var(--bg-dark) !important;
+    }
+    
+    .swal2-input {
+        background: var(--bg-dark) !important;
+        color: var(--text-light) !important;
+        border: 1px solid var(--border-dark) !important;
+    }
+    
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/common/logo.png" alt="Logo">
+            </div>
+            <div class="sidebar-header">
+                <div class="admin-info">
+                    <div class="admin-avatar"></div>
+                    <span>Admin</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/products">Products</a></li>
+                <li><a href="/admin/maincategories">Category</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/coupons" >Coupons</a></li>
+                <li><a href="/admin/sales" >Sales Report</a></li>
+                <li><a href="/admin/users" class="active">Users</a></li>
+                <li><a href="/admin/banner">Banner</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-toggle">☰</button>
+                    <div class="search-bar" >
+                        <input type="text" placeholder="Search..." id="searchBar">
+                    </div>
+                </div>
+                
+            </div>
+
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone No</th>
+                            <th>Status</th>
+                            <th>Added</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+
+    <script src="/javascripts/admin/users.js"></script>
+</body>
+</html>

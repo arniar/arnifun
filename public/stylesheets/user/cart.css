@@ -1,0 +1,614 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Navbar styles */
+/* Updated navbar styles */
+.navbar {
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+    padding: 1rem 2rem;
+}
+
+.navbar.scrolled {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.nav-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #eab308;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a, .nav-right a {
+    color: #d1d5db;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover, .nav-right a:hover {
+    color: #eab308;
+}
+
+.nav-right {
+    display: flex;
+    gap: 1.5rem;
+}
+
+/* Main content */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px 40px;
+}
+
+/* Cart styles */
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #333;
+    gap: 20px;
+}
+
+.product-image {
+    width: 100px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-details {
+    flex-grow: 1;
+}
+
+.product-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: #eab308;
+}
+
+.color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    vertical-align: middle;
+    border: 2px solid #333;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.quantity-btn:hover {
+    background: #444;
+}
+
+.quantity-input {
+    background: transparent;
+    border: 1px solid #333;
+    color: white;
+    padding: 8px;
+    width: 50px;
+    text-align: center;
+    border-radius: 4px;
+}
+
+/* Coupon section with new styles */
+.coupon-section {
+    margin: 20px 0;
+    position: relative;
+}
+
+.coupon-input {
+    padding: 12px;
+    margin-right: 10px;
+    background: transparent;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 4px;
+    width: 200px;
+    transition: border-color 0.2s;
+}
+
+.coupon-input:focus {
+    outline: none;
+    border-color: #eab308;
+}
+
+.redeem-btn {
+    background: #eab308;
+    color: black;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.redeem-btn:hover {
+    background: #ca9703;
+}
+
+/* New coupon suggestion styles */
+.show-coupons-btn {
+    background: transparent;
+    border: 1px solid #eab308;
+    color: #eab308;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 10px;
+    transition: all 0.2s;
+}
+
+.show-coupons-btn:hover {
+    background: rgba(234, 179, 8, 0.1);
+}
+
+.coupon-suggestions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    width: 300px;
+    z-index: 100;
+    border: 1px solid #333;
+    backdrop-filter: blur(8px);
+}
+
+.coupon-suggestions.active {
+    display: block;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.coupon-suggestions h4 {
+    margin: 0 0 10px 0;
+    color: #eab308;
+}
+
+.coupon-item {
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.coupon-item:hover {
+    border-color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+}
+
+.coupon-code {
+    font-family: monospace;
+    color: #eab308;
+    font-weight: bold;
+}
+
+/* Summary section */
+.summary {
+    margin-top: 30px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 5px 0;
+}
+
+.summary-row:last-child {
+    border-top: 1px solid #333;
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+.checkout-btn {
+    background: #eab308;
+    color: black;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.checkout-btn:hover {
+    background: #ca9703;
+}
+
+/* Checkout styles */
+.checkout-flow {
+    margin-top: 40px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+    color: #d1d5db;
+}
+
+.step.active {
+    background: #eab308;
+    color: black;
+}
+
+.card {
+    background: #222;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #eab308;
+}
+
+.card-content {
+    margin-bottom: 10px;
+}
+
+.order-summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.payment-method.selected {
+    border-color: #eab308;
+}
+
+.payment-method img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.coupon-input {
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    width: calc(100% - 120px);
+    margin-right: 10px;
+}
+
+.apply-coupon-btn {
+    background: #eab308;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.apply-coupon-btn:hover {
+    background: #ca9703;
+}
+
+.order-details {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.order-details p {
+    margin: 5px 0;
+}
+
+/* Footer */
+footer {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 4rem 2rem;
+    backdrop-filter: blur(8px);
+    margin-top: 4rem;
+   
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section h3 {
+    color: #eab308;
+    margin-bottom: 1rem;
+}
+
+.footer-section a {
+    display: block;
+    color: #d1d5db;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.footer-section a:hover {
+    color: #eab308;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+.coupon-details {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.coupon-details small {
+    color: #999;
+}
+
+.no-coupons {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Update existing coupon item styles */
+.coupon-item {
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(51, 51, 51, 0.1);
+}
+
+.coupon-item:hover {
+    border-color: #eab308;
+    background: rgba(234, 179, 8, 0.1);
+}
+
+.coupon-code {
+    font-family: monospace;
+    color: #eab308;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.size-selector {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.size-select {
+    background: transparent;
+    border: 1px solid #333;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.size-select:focus {
+    outline: none;
+    border-color: #eab308;
+}
+
+.size-select option {
+    background: #121212;
+    color: white;
+}
+
+.size-select option:disabled {
+    color: #666;
+}
+
+.stock-warning {
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.out-of-stock {
+    color: #ef4444;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+.out-of-stock-item {
+    opacity: 0.7;
+    position: relative;
+}
+
+.stock-error {
+    color: #ff0000;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.overview-link {
+    font-size: 0.8em;
+    margin-left: 10px;
+    color: #666;
+    text-decoration: none;
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.overview-link:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.product-details h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.one{
+    margin-bottom: 25px;
+}
+.empty-cart{
+    height:60vh;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+/* Custom Scrollbar Styles */
+/* For Webkit browsers (Chrome, Safari, etc.) */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+    background-color: #121212;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(234, 179, 8, 0.3);
+    border-radius: 6px;
+    border: 3px solid #121212;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(234, 179, 8, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+    background: #121212;
+}
+
+/* For Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(234, 179, 8, 0.3) rgba(0, 0, 0, 0.3);
+}
+
+/* For elements with custom scrollbars */
+.custom-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(234, 179, 8, 0.3) rgba(0, 0, 0, 0.3);
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(234, 179, 8, 0.3);
+    border-radius: 4px;
+    border: 2px solid #121212;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(234, 179, 8, 0.5);
+}

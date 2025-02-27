@@ -1,0 +1,352 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+:root {
+    --sidebar-width: 240px;
+    --primary-color: #6366f1;
+    --bg-dark: #111827;
+    --card-dark: #1f2937;
+    --text-light: #f3f4f6;
+    --border-dark: #374151;
+    --scrollbar-width: 12px;
+    --scrollbar-track: #1f2937;  /* Matches --card-dark */
+    --scrollbar-thumb: #374151;  /* Matches --border-dark */
+    --scrollbar-thumb-hover: #4b5563;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow: hidden; /* Prevent body scroll */
+}
+
+.container {
+    display: flex;
+    height: 100vh; /* Fixed height */
+    position: fixed; /* Fix container */
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+/* Logo Styles */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    border-bottom: 1px solid #374151;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text-light);
+}
+
+/* Sidebar Styles */
+/* Logout Button Styles */
+.logout-container {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    border-top: 1px solid #374151;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background-color: #ef4444;
+    color: var(--text-light);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Update sidebar to accommodate logout button */
+.sidebar {
+    position: fixed;
+    width: var(--sidebar-width);
+    background: var(--card-dark);
+    height: 100vh;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    z-index: 100;
+    padding-bottom: 90px; /* Add padding to prevent content from being hidden behind logout button */
+}
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #374151;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 20px 0;
+}
+
+.nav-links li a {
+    display: flex;
+    padding: 12px 20px;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.nav-links li a:hover {
+    background: var(--border-dark);
+}
+
+.nav-links li a.active {
+    background: var(--primary-color);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 240px;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--card-dark);
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Status Tabs */
+.status-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.status-tab {
+    padding: 8px 16px;
+    background: var(--card-dark);
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.status-tab.active {
+    background: var(--primary-color);
+}
+
+/* Table Styles */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-dark);
+    margin-bottom: 20px;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.orders-table tr:hover {
+    background: rgba(55, 65, 81, 0.5);
+}
+
+/* Status Colors */
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.status-delivered { color: #10b981; }
+.status-processing { color: #f59e0b; }
+.status-shipped { color: #3b82f6; }
+.status-cancelled { color: #ef4444; }
+
+/* Edit Button */
+.edit-btn {
+    padding: 4px 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-btn {
+    padding: 8px 16px;
+    background: var(--card-dark);
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.page-btn.active {
+    background: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .orders-table {
+        overflow-x: auto;
+    }
+}
+
+/* Add these styles to your existing CSS */
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-thumbnail {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.variant-id {
+    display: none;
+}
+/* Add these styles to your orders.css file */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.page-btn {
+    padding: 8px 16px;
+    background: var(--card-dark);
+    border: 1px solid var(--border-dark);
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 4px;
+    min-width: 40px;
+    transition: background-color 0.2s;
+}
+
+.page-btn:hover {
+    background: var(--border-dark);
+}
+
+.page-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.page-btn-prev,
+.page-btn-next {
+    background: var(--bg-dark);
+}
+
+.page-ellipsis {
+    color: var(--text-light);
+    padding: 0 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pagination {
+        flex-wrap: wrap;
+    }
+    
+    .page-btn {
+        padding: 6px 12px;
+        min-width: 35px;
+        font-size: 14px;
+    }
+}
+/* Webkit browsers (Chrome, Safari, newer Edge) */
+::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 6px;
+    border: 3px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}

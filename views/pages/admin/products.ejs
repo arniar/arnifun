@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="/stylesheets/admin/products.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        .swal2-popup {
+            background: var(--card-dark) !important;
+            color: var(--text-light) !important;
+            border: 1px solid var(--border-dark);
+        }
+        
+        .swal2-title, .swal2-html-container {
+            color: var(--text-light) !important;
+        }
+        
+        .swal2-confirm {
+            background: var(--primary-color) !important;
+        }
+        
+        .swal2-cancel {
+            background: var(--bg-dark) !important;
+        }
+        
+        .swal2-input {
+            background: var(--bg-dark) !important;
+            color: var(--text-light) !important;
+            border: 1px solid var(--border-dark) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/common/logo.png" alt="Logo">
+            </div>
+            <div class="admin-info">
+                <div class="admin-avatar"></div>
+                <span>Admin</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/admin/dashboard" >Dashboard</a></li>
+                <li><a href="/admin/products" class="active">Products</a></li>
+                <li><a href="/admin/maincategories">Category</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/coupons">Coupons</a></li>
+                <li><a href="/admin/sales">Sales Report</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/banner">Banner</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <h1 class="page-title">Product Details</h1>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search...">
+                </div>
+                <a href="/admin/products/addProduct"><button class="add-product-btn" id="add-product">+ Add Product</button></a>
+            </div>
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Products</th>
+                        <th>Product Id</th>
+                        <th>Price</th>
+                        <th>Discount Price</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    <% products.forEach((product) => { %>
+                        <!-- Your existing product rows code -->
+                    <% }) %>
+                </tbody>
+            </table>
+        </main>
+    </div>
+    <script src="/javascripts/admin/products.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,137 @@
+<!-- views/partials/admin/productsTable.ejs -->
+<% products.forEach(product => { %>
+  <tr>
+    <td>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img class="category-image" src="">
+        <div class="product-info">
+          <img src="<%= product.displayImage || '/api/placeholder/48/48' %>" alt="<%= product.name %>" class="product-image">
+          <span class="product-name"><%= product.name %></span>
+      </div>
+      </div>
+    
+  </td>
+  <td><%= product.productId %></td>
+  <td><%= product.price %></td>
+  <td><%= product.discountPrice %></td>
+  <td class="<%= product.status === 'active' ? 'statusActive' : 'statusInactive' %>">
+    <%= product.status %>
+</td>
+  <td><%= product.description %></td>
+      <td class="action-buttons">
+          <!-- Edit Button and Modal -->
+          <button class="action-btn edit-product-btn">✏️</button>
+          <div class="cat-modal__overlay active">
+              <div class="cat-modal__container">
+                  <div class="cat-modal__header">
+                      <h2>Edit Product</h2>
+                      <button class="cat-modal__close-btn">&times;</button>
+                  </div>
+                  <div class="cat-modal__content">
+                      <form class="cat-form">
+                          <input type="hidden" class="id" value="<%= product._id %>">
+                          <div class="cat-form__group">
+                              <label for="productName">Product Name</label>
+                              <input type="text" id="productName" class="cat-form__input" value="<%= product.name %>" required>
+                          </div>
+                          <div class="cat-form__group">
+                              <label for="description">Description</label>
+                              <textarea id="description" class="cat-form__input" required><%= product.description %></textarea>
+                          </div>
+                          <div class="cat-form__group">
+                              <label for="price">Price</label>
+                              <input type="number" id="price" class="cat-form__input" value="<%= product.price %>" required>
+                          </div>
+                          <div class="cat-modal__btn-group">
+                              <button type="button" class="cat-btn cat-btn--cancel">Cancel</button>
+                              <button type="submit" class="cat-btn cat-btn--submit">Save Changes</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+
+          <% if (product.status === 'active') { %>
+            <button class="action-btn makeInactive">🔴</button>
+        <% } else { %>
+          <button class="action-btn makeActive">🟢</button>
+        <% } %>
+          <!-- Delete Button -->
+          <button class="action-btn delete-product-btn permanentDelete">🗑️</button>
+          <a href="/admin/variant?id=<%= product._id %>"><button class="action-btn ">Let's Go ➡️</button></a>
+      </td>
+  </tr>
+<% }); %>
+
+<!-- Pagination Section -->
+<!-- Pagination Section -->
+<% if (totalPages > 1) { %>
+  <tr>
+      <td colspan="7">
+          <div class="pagination" id="pagination-container">
+              <!-- Previous Button -->
+              <% if (currentPage > 1) { %>
+                  <button class="pagination-btn prev-btn" data-page="<%= currentPage - 1 %>">
+                      Previous
+                  </button>
+              <% } %>
+              
+              <!-- First Page -->
+              <% if (currentPage = 1) { %>
+                  <button class="pagination-btn" data-page="1">1</button>
+                  <% if (currentPage > 3) { %>
+                      <span class="pagination-ellipsis">...</span>
+                  <% } %>
+              <% } %>
+              
+              <!-- Page Numbers -->
+              <% pages.forEach(page => { %>
+                  <button class="pagination-btn <%= page === currentPage ? 'active' : '' %>" 
+                          data-page="<%= page %>">
+                      <%= page %>
+                  </button>
+              <% }); %>
+              
+              <!-- Last Page -->
+              <% if (currentPage < totalPages - 1) { %>
+                  <% if (currentPage < totalPages - 2) { %>
+                      <span class="pagination-ellipsis">...</span>
+                  <% } %>
+                  <button class="pagination-btn" data-page="<%= totalPages %>">
+                      <%= totalPages %>
+                  </button>
+              <% } %>
+              
+              <!-- Next Button -->
+              <% if (currentPage < totalPages) { %>
+                  <button class="pagination-btn next-btn" data-page="<%= currentPage + 1 %>">
+                      Next
+                  </button>
+              <% } %>
+          </div>
+      </td>
+  </tr>
+<% } %>
+
+
+<!-- No Products Message -->
+<% if (products.length === 0) { %>
+  <tr>
+      <td colspan="7" style="text-align: center; padding: 20px;">
+          No products found
+          <% if (searchQuery) { %>
+              for "<%= searchQuery %>"
+          <% } %>
+      </td>
+  </tr>
+<% } %>
+
+<!-- Search Results Count -->
+<% if (products.length > 0 && searchQuery) { %>
+  <tr>
+      <td colspan="7" style="text-align: center; padding: 10px;">
+          Found <%= totalProducts %> result<%= totalProducts !== 1 ? 's' : '' %> 
+          for "<%= searchQuery %>"
+      </td>
+  </tr>
+<% } %>
