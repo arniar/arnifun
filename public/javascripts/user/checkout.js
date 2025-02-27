@@ -155,7 +155,7 @@ function initializePaymentMethods() {
             // Add message explaining why COD is disabled
             const warningMessage = document.createElement('p');
             warningMessage.className = 'text-red-500 text-sm mt-1';
-            warningMessage.textContent = 'Cash on Delivery not available for orders above $1,000';
+            warningMessage.textContent = 'Cash on Delivery not available for orders above ₹1,000';
             codLabel.appendChild(warningMessage);
         }
     }
@@ -167,7 +167,7 @@ function initializePaymentMethods() {
             
             // Check if method is COD and if total amount exceeds limit
             if (method.dataset.method === 'cod' && !isCODAllowed) {
-                showToast('Cash on Delivery is not available for orders above $1,000', 'warning');
+                showToast('Cash on Delivery is not available for orders above ₹1,000', 'warning');
                 return;
             }
             
@@ -448,7 +448,7 @@ function setupPlaceOrderButton() {
 
             // Double-check COD restriction
             if (selectedPaymentMethod === 'cod' && totalAmount > 1000) {
-                showToast('Cash on Delivery is not available for orders above $1,000', 'error');
+                showToast('Cash on Delivery is not available for orders above ₹1,000', 'error');
                 return;
             }
 
@@ -585,7 +585,7 @@ async function initializeWalletPayment() {
                    ${!hasEnoughBalance ? 'disabled' : ''}>
             <label for="wallet" class="${!hasEnoughBalance ? 'opacity-50' : ''}">
                 <h3>Pay with Wallet</h3>
-                <p>Available Balance: $${balance.toFixed(2)}</p>
+                <p>Available Balance: ₹${balance.toFixed(2)}</p>
                 ${!hasEnoughBalance ? 
                     `<p class="text-red-500 text-sm mt-1">
                         Insufficient balance for this order
