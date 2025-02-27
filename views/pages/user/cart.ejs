@@ -70,7 +70,7 @@
                         
                         <a href="#" class="remove-link" onclick="removeItem(event, '<%= item.variantId %>')">Remove</a>
                     </div>
-                    <div>$<%= (item.discountPrice || item.price).toFixed(2) %></div>
+                    <div>₹<%= ((item.discountPrice || item.price) * 83).toFixed(2) %></div>
                     <div class="quantity-controls">
                         <button class="quantity-btn" onclick="updateQuantity('<%= item.variantId %>', -1)" 
                                 <%= !item.inStock ? 'disabled="disabled"' : '' %>>-</button>
@@ -96,7 +96,7 @@
                                 <div class="coupon-code"><%= coupon.couponCode %></div>
                                 <div><%= coupon.couponName %></div>
                                 <div class="coupon-details">
-                                    $<%= coupon.discount %> off on orders above $<%= coupon.minAmount %>
+                                    ₹<%= (coupon.discount * 83).toFixed(2) %> off on orders above ₹<%= (coupon.minAmount * 83).toFixed(2) %>
                                     <br>
                                     <small>Valid until <%= coupon.formattedDate %></small>
                                 </div>
@@ -111,11 +111,11 @@
             <div class="summary">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>$<%= totalAmount.toFixed(2) %></span>
+                    <span>₹<%= (totalAmount * 83).toFixed(2) %></span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping fee</span>
-                    <span>$20.00</span>
+                    <span>₹1660.00</span>
                 </div>
                 <div class="summary-row">
                     <span>Discount</span>
@@ -123,7 +123,7 @@
                 </div>
                 <div class="summary-row">
                     <strong>TOTAL</strong>
-                    <strong id="totalAmount">$<%= (totalAmount + 20).toFixed(2) %></strong>
+                    <strong id="totalAmount">₹<%= ((totalAmount + 20) * 83).toFixed(2) %></strong>
                 </div>
             </div>
 
