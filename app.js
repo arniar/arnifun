@@ -21,7 +21,7 @@ var apiRouter = require('./routes/api');
 
 var app = express();
 
-const mongoURI =  process.env.MongoDB_url||'mongodb://localhost:27017/Arni'
+const mongoURI =  process.env.MongoDB_url
 
 mongoose.connect(mongoURI)
   .then(() => console.log('MongoDB connected successfully'))
