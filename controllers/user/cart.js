@@ -92,6 +92,8 @@ exports.getCart = async (req, res) => {
         const availableCoupons = allActiveCoupons.filter(coupon => 
             !usedCouponCodes.includes(coupon.couponCode)
         );
+
+        console.log("hello")
         
         const categoriesWithSubs = await MainCategory.aggregate([
             {
