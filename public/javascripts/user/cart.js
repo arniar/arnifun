@@ -81,7 +81,8 @@
 
  animate();
 
- // Cart functionality
+
+ // Update the updateQuantity function to also pass the size parameter
  async function updateQuantity(variantId, change, size) {
     const input = document.getElementById(`quantity-${variantId}`);
     let value = parseInt(input.value) + change;
@@ -89,8 +90,7 @@
     
     // Get the size from the correct element
     const sizeElement = input.closest('.cart-item').querySelector('#size');
-    const size2 = sizeElement ? sizeElement.textContent.trim() : null;
-    console.log("hi",size2);
+    const size2 = sizeElement ? sizeElement.textContent.trim() : size;
     
     try {
         const response = await fetch('/users/cart/update-quantity', {
@@ -422,25 +422,44 @@ function updateCartTotals() {
     // Calculate subtotal from all cart items
     document.querySelectorAll('.cart-item').forEach(item => {
         const quantity = parseInt(item.querySelector('.quantity-input').value);
-        const priceText = item.querySelector('.product-details').nextElementSibling.textContent;
-        const price = parseFloat(priceText.replace('$', ''));
-        subtotal += price * quantity;
+        const priceElement = item.querySelector('.item-price');
+        
+        if (priceElement) {
+            const priceText = priceElement.textContent;
+            // Extract just the number from the price text (handles ₹ symbol)
+            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+            
+            if (!isNaN(price)) {
+                subtotal += price * quantity;
+            } else {
+                console.error('Invalid price format:', priceText);
+            }
+        }
     });
 
     // Update subtotal display
     const summaryRows = document.querySelectorAll('.summary-row');
-    summaryRows[0].querySelector('span:last-child').textContent = `$${subtotal.toFixed(2)}`;
+    if (summaryRows.length > 0) {
+        summaryRows[0].querySelector('span:last-child').textContent = `₹${subtotal.toFixed(2)}`;
+    }
 
     // Get current discount if any
-    const discountText = document.getElementById('couponStatus').textContent;
+    const discountElement = document.getElementById('couponStatus');
     let discount = 0;
-    if (discountText !== 'No discount applied') {
-        discount = parseFloat(discountText.replace('-$', ''));
+    if (discountElement && discountElement.textContent !== 'No discount applied') {
+        // Extract just the number from the discount text
+        const discountMatch = discountElement.textContent.match(/[0-9.]+/);
+        if (discountMatch) {
+            discount = parseFloat(discountMatch[0]);
+        }
     }
 
     // Calculate and update total
     const total = subtotal + shippingFee - discount;
-    document.getElementById('totalAmount').textContent = `$${total.toFixed(2)}`;
+    const totalElement = document.getElementById('totalAmount');
+    if (totalElement) {
+        totalElement.textContent = `₹${total.toFixed(2)}`;
+    }
 }
 
 function proceedToCheckout() {
