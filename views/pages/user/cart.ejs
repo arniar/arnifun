@@ -11,8 +11,8 @@
 <body>
     <canvas id="backgroundCanvas"></canvas>
 
-    <!-- Navbar -->
-    <nav class="navbar">
+     <!-- Navbar -->
+     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">ARNI</a>
             <div class="nav-links">
@@ -21,20 +21,19 @@
                 <% categoriesWithSubs.forEach(function(category) { %>
                     <a href="/subcategories?main=<%= category._id %>" 
                        data-category="true"
-                       data-categories='<%= JSON.stringify(categoriesWithSubs) %>'>
+                       data-categories="<%= JSON.stringify(categoriesWithSubs) %>">
                         <%= category.mainCategoryName.split(' ')
-                            .map(function(word, index) { 
-                                return index === 0 ? 
-                                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : 
-                                    word.toLowerCase();
-                            }).join(' ') %>
+                            .map((word, index) => index === 0 ? 
+                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : 
+                                word.toLowerCase())
+                            .join(' ') %>
                     </a>
                 <% }); %>
             </div>
             <div class="nav-right">
                 <a href="/users/pI">
                     <i class="fas fa-user-circle"></i> Profile
-                </a>
+                  </a>
                 <a href="/users/cart">🛒</a>
             </div>
         </div>
@@ -47,7 +46,7 @@
                 <a href="/shop" class="checkout-btn">Continue Shopping</a>
             </div>
         <% } else { %>
-            <% items.forEach(function(item) { %>
+            <% items.forEach(item => { %>
                 <div class="cart-item <%= !item.inStock ? 'out-of-stock-item' : '' %>" data-variant-id="<%= item.variantId %>">
                     <img src="<%= item.images[0] %>" alt="<%= item.name %>" class="product-image">
                     <div class="product-details">
@@ -59,7 +58,7 @@
                             Color: <span class="color-circle" style="background-color: <%= item.color %>;"></span>
                             Size: <span id="size"><%= item.size %></span>
                         </p>
-
+                        
                         <% if (!item.inStock) { %>
                             <p class="stock-error">
                                 Requested quantity not available. Only <%= item.availableStock %> in stock.
@@ -70,15 +69,15 @@
                         
                         <a href="#" class="remove-link" onclick="removeItem(event, '<%= item.variantId %>')">Remove</a>
                     </div>
-                    <div>₹<%= ((item.discountPrice || item.price) * 83).toFixed(2) %></div>
+                    <div>₹<%= (item.discountPrice || item.price).toFixed(2) %></div>
                     <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="updateQuantity('<%= item.variantId %>', -1)" 
-                                <%= !item.inStock ? 'disabled="disabled"' : '' %>>-</button>
+                        <button class="quantity-btn" onclick="updateQuantity('<%= item.variantId %>', -1)"
+                                <%= !item.inStock ? 'disabled' : '' %>>-</button>
                         <input type="text" value="<%= item.quantity %>" class="quantity-input" 
                                id="quantity-<%= item.variantId %>"
-                               <%= !item.inStock ? 'disabled="disabled"' : '' %>>
-                        <button class="quantity-btn" onclick="updateQuantity('<%= item.variantId %>', 1)" 
-                                <%= !item.inStock ? 'disabled="disabled"' : '' %>>+</button>
+                               <%= !item.inStock ? 'disabled' : '' %>>
+                        <button class="quantity-btn" onclick="updateQuantity('<%= item.variantId %>', 1)"
+                                <%= !item.inStock ? 'disabled' : '' %>>+</button>
                     </div>
                 </div>
             <% }); %>
@@ -91,14 +90,14 @@
                 <div class="coupon-suggestions" id="couponSuggestions">
                     <h4>Available Coupons</h4>
                     <% if (coupons && coupons.length > 0) { %>
-                        <% coupons.forEach(function(coupon) { %>
+                        <% coupons.forEach(coupon => { %>
                             <div class="coupon-item" onclick="selectCoupon('<%= coupon.couponCode %>')">
                                 <div class="coupon-code"><%= coupon.couponCode %></div>
                                 <div><%= coupon.couponName %></div>
                                 <div class="coupon-details">
-                                    ₹<%= (coupon.discount * 83).toFixed(2) %> off on orders above ₹<%= (coupon.minAmount * 83).toFixed(2) %>
+                                    ₹<%= coupon.discount %> off on orders above ₹<%= coupon.minAmount %>
                                     <br>
-                                    <small>Valid until <%= coupon.formattedDate %></small>
+                                    <small>Valid until <%= new Date(coupon.validity).toLocaleDateString() %></small>
                                 </div>
                             </div>
                         <% }); %>
@@ -111,11 +110,11 @@
             <div class="summary">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>₹<%= (totalAmount * 83).toFixed(2) %></span>
+                    <span>₹<%= totalAmount.toFixed(2) %></span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping fee</span>
-                    <span>₹1660.00</span>
+                    <span>₹20.00</span>
                 </div>
                 <div class="summary-row">
                     <span>Discount</span>
@@ -123,7 +122,7 @@
                 </div>
                 <div class="summary-row">
                     <strong>TOTAL</strong>
-                    <strong id="totalAmount">₹<%= ((totalAmount + 20) * 83).toFixed(2) %></strong>
+                    <strong id="totalAmount">₹<%= (totalAmount + 20).toFixed(2) %></strong>
                 </div>
             </div>
 
@@ -132,33 +131,32 @@
             </button>
         <% } %>
     </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>About ARNI</h3>
-                <p>Fashion for everyone</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="/">Home</a>
-                <a href="/shop">Shop</a>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@arni.com</p>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-links">
-                    <a href="#">Instagram</a>
-                    <a href="#">Facebook</a>
-                    <a href="#">Twitter</a>
-                </div>
+<!-- Footer -->
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>About ARNI</h3>
+            <p>Fashion for everyone</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <a href="/">Home</a>
+            <a href="/shop">Shop</a>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>Email: info@arni.com</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Facebook</a>
+                <a href="#">Twitter</a>
             </div>
         </div>
-    </footer>
-    <script src="/javascripts/user/cart.js"></script>
+    </div>
+</footer>
+   <script src="/javascripts/user/cart.js"></script>
 </body>
 </html>

@@ -57,7 +57,7 @@
                                     <p class="stock-warning">Only <%= item.availableStock %> left in stock!</p>
                                 <% } %>
                             </div>
-                            <div>₹<%= (item.discountPrice || item.price).toFixed(2) %></div>
+                            <div>$<%= (item.discountPrice || item.price).toFixed(2) %></div>
                             <div class="quantity-controls">
                                 <input type="text" value="<%= item.quantity %>" class="quantity-input" 
                                        id="quantity-<%= item.variantId %>"
@@ -100,19 +100,19 @@
         <div class="summary">
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>₹<%= totalAmount.toFixed(2) %></span>
+                <span>$<%= totalAmount.toFixed(2) %></span>
             </div>
             <div class="summary-row">
                 <span>Shipping fee</span>
-                <span>₹20.00</span>
+                <span>$20.00</span>
             </div>
             <div class="summary-row">
                 <span>Discount</span>
-                <span id="couponStatus">₹<%= discount %></span>
+                <span id="couponStatus">$<%= discount %></span>
             </div>
             <div class="summary-row">
                 <strong>TOTAL</strong>
-                <strong id="totalAmount">₹<%= (totalAmount + 20 - discount).toFixed(2) %></strong>
+                <strong id="totalAmount">$<%= (totalAmount + 20 - discount).toFixed(2) %></strong>
             </div>
             <button class="btn" id="placeOrderBtn" style="width: 100%; margin-top: 1rem;">Place Order</button>
         </div>
