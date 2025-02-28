@@ -11,12 +11,12 @@ const wallet = require('./user/wallet');
 const orderOverview = require('./user/orderOverview');
 
 
-const isAuthenticated = require('../middlewares/userLoginCheck');
+// const isAuthenticated = require('../middlewares/userLoginCheck');
 
 
 
-// Apply authentication middleware
-router.use(isAuthenticated);
+// // Apply authentication middleware
+// router.use(isAuthenticated);
 
 
 router.use('/pI', PIRouter);

@@ -1,6 +1,5 @@
-
-// 📝 Common Utility Function for Validation Feedback
-function setError(element, message) {
+ // 📝 Common Utility Function for Validation Feedback
+ function setError(element, message) {
     const messageElement = document.getElementById(`${element.id}Message`);
     messageElement.textContent = message;
     element.classList.add('iAfter');
@@ -62,48 +61,49 @@ fullName.addEventListener('input', validateFullName2);
 
 // 📧 Email Validation
 const emailOrPhone = document.getElementById('emailOrPhone');
-        const emailOrPhoneMessage = document.getElementById('emailOrPhoneMessage');
-        let emailOrPhoneError = false;
+const emailOrPhoneMessage = document.getElementById('emailOrPhoneMessage');
+let emailOrPhoneError = false;
 
-        function validateEmailOrPhone() {
-            let value = emailOrPhone.value.trim();
-            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Email regex
-            let phoneRegex = /^[+]?[0-9]{10,15}$/;  // Phone number regex
+function validateEmailOrPhone() {
+    let value = emailOrPhone.value.trim();
+    let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  // Email regex
+    let phoneRegex = /^[+]?[0-9]{10,15}$/;  // Phone number regex
 
-            if (value === '') {
-                setError(emailOrPhone, 'Email or Phone Number is required');
-                emailOrPhoneError = true;
-            } else if (!emailRegex.test(value) && !phoneRegex.test(value)) {
-                setError(emailOrPhone, 'Invalid email or phone number format');
-                emailOrPhoneError = true;
-            } else {
-                clearError(emailOrPhone);
-                emailOrPhoneError = false;
-            }
-        }
+    if (value === '') {
+        setError(emailOrPhone, 'Email or Phone Number is required');
+        emailOrPhoneError = true;
+    } else if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+        setError(emailOrPhone, 'Invalid email or phone number format');
+        emailOrPhoneError = true;
+    } else {
+        clearError(emailOrPhone);
+        emailOrPhoneError = false;
+    }
+}
 
-        function validateEmailOrPhone2() {
-            if (!emailOrPhoneError) {
-                return;
-            }
-            let value = emailOrPhone.value.trim();
-            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            let phoneRegex = /^[+]?[0-9]{10,15}$/;
+function validateEmailOrPhone2() {
+    if (!emailOrPhoneError) {
+        return;
+    }
+    let value = emailOrPhone.value.trim();
+    let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let phoneRegex = /^[+]?[0-9]{10,15}$/;
 
-            if (value === '') {
-                 setError(emailOrPhone, 'Email or Phone Number is required');
-                 emailOrPhoneError = true;
-            } else if (!emailRegex.test(value) && !phoneRegex.test(value)) {
-                setError(emailOrPhone, 'Invalid email or phone number format');
-                emailOrPhoneError = true;
-            } else {
-                clearError(emailOrPhone);
-                emailOrPhoneError = false;
-            }
-        }
+    if (value === '') {
+         setError(emailOrPhone, 'Email or Phone Number is required');
+         emailOrPhoneError = true;
+    } else if (!emailRegex.test(value) && !phoneRegex.test(value)) {
+        setError(emailOrPhone, 'Invalid email or phone number format');
+        emailOrPhoneError = true;
+    } else {
+        clearError(emailOrPhone);
+        emailOrPhoneError = false;
+    }
+}
 
-        emailOrPhone.addEventListener('blur', validateEmailOrPhone);
-        emailOrPhone.addEventListener('input', validateEmailOrPhone2);
+emailOrPhone.addEventListener('blur', validateEmailOrPhone);
+emailOrPhone.addEventListener('input', validateEmailOrPhone2);
+
 // 🔑 Password Validation
 const password = document.getElementById('password');
 let passwordError = false;
@@ -207,7 +207,6 @@ togglePasswordConfirm.addEventListener('click', () => {
   togglePasswordConfirm.classList.toggle('fa-eye');
   togglePasswordConfirm.classList.toggle('fa-eye-slash');
 });
-
 
 const passwordCriteriaContainer = document.querySelector('.password-criteria');
 
@@ -405,26 +404,3 @@ window.addEventListener('mousemove', (e) => {
 });
 
 animate();
-
-// Scroll animations for elements
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-// Animate sections on scroll
-document.querySelectorAll('.section-title, .category, .product-card, .blog-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'all 0.6s ease-out';
-    observer.observe(el);
-});

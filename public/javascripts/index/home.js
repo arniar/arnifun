@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const animationDuration = 500;
         let slideInterval;
 
+        // Adjust slider timing based on device
+        const isMobile = window.innerWidth < 768;
+        const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+        const slideIntervalDuration = isMobile ? 5000 : 7000; // Faster on mobile
+
         // Initialize slide backgrounds
         function initializeSlideBackgrounds() {
             slides.forEach(slide => {
@@ -90,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Auto-slide functions
         function startAutoSlide() {
             stopAutoSlide();
-            slideInterval = setInterval(nextSlide, 5000);
+            slideInterval = setInterval(nextSlide, slideIntervalDuration);
         }
 
         function stopAutoSlide() {
@@ -198,6 +203,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const ctx = canvas.getContext('2d');
         let mousePosition = { x: 0, y: 0 };
+        const isMobile = window.innerWidth < 768;
+
+        // Adjust particle count based on device for better performance
+        const particleCount = isMobile ? 30 : 100;
 
         function setCanvasSize() {
             canvas.width = window.innerWidth;
@@ -246,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        const particles = Array.from({ length: 100 }, () => new Particle());
+        const particles = Array.from({ length: particleCount }, () => new Particle());
 
         function animate() {
             ctx.fillStyle = 'rgba(18, 18, 18, 0.1)';
@@ -280,74 +289,111 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =============== SEARCH FUNCTIONALITY ===============
     const searchIcon = document.querySelector('.nav-right a:nth-child(2)');
-var navbar = document.querySelector('.nav-container');
-let searchBar = null;
+    var navbar = document.querySelector('.nav-container');
+    let searchBar = null;
 
-searchIcon.addEventListener('click', (e) => {
-    e.preventDefault();
-    
-    if (searchBar) {
-        // If search bar exists, remove it
-        searchBar.remove();
-        searchBar = null;
-        return;
-    }
-    
-    // Create search bar container
-    searchBar = document.createElement('div');
-    searchBar.className = 'search-container';
-    
-    // Create search form
-    const searchForm = document.createElement('form');
-    searchForm.className = 'search-form';
-    searchForm.action = '/search';
-    searchForm.method = 'GET';
-    
-    // Create search input
-    const searchInput = document.createElement('input');
-    searchInput.type = 'text';
-    searchInput.name = 'search';
-    searchInput.placeholder = 'Search products...';
-    searchInput.className = 'search-input';
-    
-    // Create submit button
-    const submitButton = document.createElement('button');
-    submitButton.type = 'submit';
-    submitButton.className = 'search-submit';
-    submitButton.innerHTML = '🔍';
-    
-    // Create close button
-    const closeButton = document.createElement('button');
-    closeButton.type = 'button';
-    closeButton.className = 'search-close';
-    closeButton.innerHTML = '✕';
-    closeButton.onclick = () => {
-        searchBar.remove();
-        searchBar = null;
-    };
-    
-    // Assemble the search bar
-    searchForm.appendChild(searchInput);
-    searchForm.appendChild(submitButton);
-    searchForm.appendChild(closeButton);
-    searchBar.appendChild(searchForm);
-    
-    // Insert search bar after navbar
-    navbar.appendChild(searchBar);
-    
-    // Focus the input
-    searchInput.focus();
-});
+    searchIcon.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        if (searchBar) {
+            // If search bar exists, remove it
+            searchBar.remove();
+            searchBar = null;
+            return;
+        }
+        
+        // Create search bar container
+        searchBar = document.createElement('div');
+        searchBar.className = 'search-container';
+        
+        // Create search form
+        const searchForm = document.createElement('form');
+        searchForm.className = 'search-form';
+        searchForm.action = '/search';
+        searchForm.method = 'GET';
+        
+        // Create search input
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.name = 'search';
+        searchInput.placeholder = 'Search products...';
+        searchInput.className = 'search-input';
+        
+        // Create submit button
+        const submitButton = document.createElement('button');
+        submitButton.type = 'submit';
+        submitButton.className = 'search-submit';
+        submitButton.innerHTML = '🔍';
+        
+        // Create close button
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'search-close';
+        closeButton.innerHTML = '✕';
+        closeButton.onclick = () => {
+            searchBar.remove();
+            searchBar = null;
+        };
+        
+        // Assemble the search bar
+        searchForm.appendChild(searchInput);
+        searchForm.appendChild(submitButton);
+        searchForm.appendChild(closeButton);
+        searchBar.appendChild(searchForm);
+        
+        // Insert search bar after navbar
+        navbar.appendChild(searchBar);
+        
+        // Focus the input
+        searchInput.focus();
+    });
 
-// Close search bar when clicking outside
-document.addEventListener('click', (e) => {
-    if (searchBar && 
-        !searchBar.contains(e.target) && 
-        !searchIcon.contains(e.target)) {
-        searchBar.remove();
-        searchBar = null;
+    // Close search bar when clicking outside
+    document.addEventListener('click', (e) => {
+        if (searchBar && 
+            !searchBar.contains(e.target) && 
+            !searchIcon.contains(e.target)) {
+            searchBar.remove();
+            searchBar = null;
+        }
+    });
+
+    // =============== MOBILE MENU TOGGLE ===============
+    function initializeMobileMenu() {
+        const hamburgerMenu = document.createElement('div');
+        hamburgerMenu.className = 'hamburger-menu';
+        hamburgerMenu.innerHTML = '<span></span><span></span><span></span>';
+        
+        const navContainer = document.querySelector('.nav-container');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (navContainer && !document.querySelector('.hamburger-menu')) {
+            navContainer.insertBefore(hamburgerMenu, navLinks);
+        }
+        
+        // Toggle mobile menu
+        hamburgerMenu.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            this.classList.toggle('active');
+            document.body.classList.toggle('menu-open');
+        });
+        
+        // Handle category touch events on mobile
+        const categoryLinks = document.querySelectorAll('a[data-category="true"]');
+        categoryLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.matchMedia('(hover: none)').matches) {
+                    e.preventDefault();
+                    categoryLinks.forEach(otherLink => {
+                        if (otherLink !== link) {
+                            otherLink.classList.remove('touch-active');
+                        }
+                    });
+                    this.classList.toggle('touch-active');
+                }
+            });
+        });
     }
-});
 
     // =============== SCROLL ANIMATIONS ===============
     function initializeScrollAnimations() {
@@ -392,7 +438,8 @@ document.addEventListener('click', (e) => {
             
             if (scrollTop > lastScrollTop && scrollTop > 100) {
                 navbar.style.transform = 'translateY(-100%)';
-            } else {navbar.style.transform = 'translateY(0)';
+            } else {
+                navbar.style.transform = 'translateY(0)';
             }
             
             lastScrollTop = scrollTop;
@@ -463,6 +510,37 @@ document.addEventListener('click', (e) => {
         });
     }
 
+    // =============== RESPONSIVE LAYOUT ADJUSTMENTS ===============
+    function initializeResponsiveLayout() {
+        function adjustLayout() {
+            const productCards = document.querySelectorAll('.product-card');
+            if (window.innerWidth < 480) {
+                productCards.forEach(card => {
+                    const info = card.querySelector('.product-info');
+                    if (info) {
+                        // Simplify info on very small screens
+                        const priceRow = info.querySelector('.price-row');
+                        if (priceRow) {
+                            priceRow.style.flexDirection = 'column';
+                            priceRow.style.alignItems = 'center';
+                        }
+                    }
+                });
+            } else {
+                productCards.forEach(card => {
+                    const priceRow = card.querySelector('.price-row');
+                    if (priceRow) {
+                        priceRow.style.flexDirection = '';
+                        priceRow.style.alignItems = '';
+                    }
+                });
+            }
+        }
+
+        window.addEventListener('resize', adjustLayout);
+        adjustLayout(); // Initial adjustment
+    }
+
     // =============== PERFORMANCE OPTIMIZATIONS ===============
     function initializePerformanceOptimizations() {
         window.addEventListener('load', () => {
@@ -499,10 +577,12 @@ document.addEventListener('click', (e) => {
             // Initialize all components
             initializeSlider();
             initializeBackgroundCanvas();
+            initializeMobileMenu();
             const scrollObserver = initializeScrollAnimations();
             initializeNavbar();
             initializeCategoryMenu();
             initializeCategoryCards();
+            initializeResponsiveLayout();
             initializePerformanceOptimizations();
             initializeErrorHandling();
 
