@@ -1,4 +1,61 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Hamburger menu functionality
+    const hamburger = document.getElementById('hamburger-menu');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        
+        // Update hamburger icon
+        const spans = hamburger.querySelectorAll('span');
+        if (sidebar.classList.contains('active')) {
+            spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+            spans[1].style.opacity = '0';
+            spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+        } else {
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        }
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 && 
+            sidebar.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            !hamburger.contains(e.target)) {
+            sidebar.classList.remove('active');
+            
+            // Reset hamburger icon
+            const spans = hamburger.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        }
+    });
+    
+    // Adjust main content based on window size
+    function adjustLayout() {
+        if (window.innerWidth <= 768) {
+            mainContent.style.marginLeft = '0';
+            sidebar.classList.remove('active');
+            
+            // Reset hamburger icon
+            const spans = hamburger.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        } else {
+            mainContent.style.marginLeft = 'var(--sidebar-width)';
+        }
+    }
+    
+    // Call on load and on window resize
+    adjustLayout();
+    window.addEventListener('resize', adjustLayout);
+
     const searchInput = document.querySelector('.search-bar input');
     let searchTimeout;
 
@@ -14,8 +71,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
     
             const html = await response.text();
-
-            console.log(html);
             
             // Update the tbody content
             const tbody = document.getElementById('tbody');
@@ -130,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     };
 
                     // Validate form data
-                    if (!formData.id || !formData.name || !formData.price ) {
+                    if (!formData.id || !formData.name || !formData.price) {
                         throw new Error('Please fill in all required fields');
                     }
 

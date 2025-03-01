@@ -3,18 +3,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/stylesheets/admin/dashboard.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <meta name="theme-color" content="#111827">
 </head>
 <body>
-    <button class="toggle-btn">☰</button>
+    <!-- Hamburger Toggle Button -->
+    <button class="toggle-btn" aria-label="Toggle Sidebar">☰</button>
     
     <div class="container">
+        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo">
-                <img src="/images/common/logo.png" alt="Logo">
+                <img src="/images/common/logo.png" alt="Company Logo">
             </div>
             
             <div class="sidebar-header">
@@ -34,11 +37,13 @@
                 <li><a href="/admin/users">Users</a></li>
                 <li><a href="/admin/banner">Banner</a></li>
             </ul>
+            
             <div class="logout-container">
                 <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
             </div>
         </aside>
 
+        <!-- Main Content Area -->
         <main class="main-content">
             <!-- Stats Grid -->
             <div class="stats-grid">
@@ -62,7 +67,7 @@
 
             <!-- Time Frame Selector -->
             <div class="chart-controls">
-                <select id="timeframe-select" class="timeframe-select">
+                <select id="timeframe-select" class="timeframe-select" aria-label="Select time frame">
                     <option value="day">Daily</option>
                     <option value="month" selected>Monthly</option>
                     <option value="year">Yearly</option>
@@ -71,15 +76,18 @@
 
             <!-- Sales Chart -->
             <div class="chart-section">
-                <canvas id="salesChart"></canvas>
+                <canvas id="salesChart" aria-label="Sales Chart" role="img"></canvas>
             </div>
 
-            <!-- Categories Section -->
+            <!-- Categories & Items Section -->
             <div class="categories-grid">
                 <!-- Top Categories -->
                 <div class="category-section">
                     <h2>Top Categories</h2>
-                    <div id="top-categories-container"></div>
+                    <div id="top-categories-container">
+                        <!-- Categories will be loaded dynamically -->
+                        <div class="no-data">Loading categories...</div>
+                    </div>
                 </div>
 
                 <!-- Most Sold Items -->
@@ -94,7 +102,7 @@
                             <div class="item">
                                 <div class="item-header">
                                     <div class="item-info">
-                                        <img src="<%= item.image %>" alt="<%= item.name %>" class="item-image">
+                                        <img src="<%= item.image %>" alt="<%= item.name %>" class="item-image" loading="lazy">
                                         <div class="item-details">
                                             <p class="item-name"><%= item.name %></p>
                                             <span class="item-count"><%= item.count %> sold</span>
@@ -112,6 +120,8 @@
             </div>
         </main>
     </div>
+    
+    <!-- Scripts -->
     <script src="/javascripts/admin/dashboard.js"></script>
 </body>
 </html>

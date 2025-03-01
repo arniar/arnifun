@@ -3,9 +3,28 @@ document.addEventListener('DOMContentLoaded', function() {
     initSidebarToggle();
     initLogout();
     loadTopCategories();
+    handleResponsiveLayout();
 });
 
 let salesChart = null;
+
+// Handle responsive layout changes
+function handleResponsiveLayout() {
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    function adjustLayout() {
+        if (window.innerWidth <= 767) {
+            sidebar.classList.remove('active');
+            mainContent.style.marginLeft = '0';
+        } else {
+            mainContent.style.marginLeft = `${sidebar.offsetWidth}px`;
+        }
+    }
+    
+    window.addEventListener('resize', adjustLayout);
+    adjustLayout();
+}
 
 async function loadTopCategories() {
     try {
@@ -47,7 +66,7 @@ async function loadTopCategories() {
     } catch (error) {
         console.error('Error loading top categories:', error);
         document.getElementById('top-categories-container').innerHTML = `
-            <div class="error-message">Error loading categories</div>
+            <div class="no-data">Error loading categories</div>
         `;
     }
 }
@@ -65,6 +84,9 @@ async function initSalesChart() {
             if (salesChart) {
                 salesChart.destroy();
             }
+            
+            // Responsive font size based on screen width
+            const fontSize = window.innerWidth < 768 ? 10 : 12;
             
             salesChart = new Chart(ctx, {
                 type: 'bar',
@@ -85,7 +107,12 @@ async function initSalesChart() {
                     plugins: {
                         legend: {
                             display: true,
-                            labels: { color: '#f3f4f6' }
+                            labels: { 
+                                color: '#f3f4f6',
+                                font: {
+                                    size: fontSize
+                                }
+                            }
                         },
                         tooltip: {
                             mode: 'index',
@@ -108,12 +135,22 @@ async function initSalesChart() {
                             grid: { color: '#374151' },
                             ticks: {
                                 color: '#f3f4f6',
+                                font: {
+                                    size: fontSize
+                                },
                                 callback: value => '₹' + value.toLocaleString()
                             }
                         },
                         x: {
                             grid: { color: '#374151' },
-                            ticks: { color: '#f3f4f6' }
+                            ticks: { 
+                                color: '#f3f4f6',
+                                font: {
+                                    size: fontSize
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
                         }
                     },
                     interaction: {
@@ -124,37 +161,56 @@ async function initSalesChart() {
             });
         } catch (error) {
             console.error('Error updating sales chart:', error);
+            document.querySelector('.chart-section').innerHTML = `
+                <div class="no-data">Error loading sales chart</div>
+            `;
         }
     }
 
     timeframeSelect.addEventListener('change', updateChart);
+    
+    // Handle chart resizing when window resizes
+    window.addEventListener('resize', () => {
+        if (salesChart) {
+            salesChart.resize();
+        }
+    });
+    
     updateChart();
 }
 
 function initSidebarToggle() {
     const toggleBtn = document.querySelector('.toggle-btn');
     const sidebar = document.querySelector('.sidebar');
-    const container = document.querySelector('.container');
+    const mainContent = document.querySelector('.main-content');
 
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         sidebar.classList.toggle('active');
-        container.classList.toggle('sidebar-hidden');
+        
+        // Only adjust margin on larger screens
+        if (window.innerWidth > 767) {
+            if (sidebar.classList.contains('active')) {
+                mainContent.style.marginLeft = `${sidebar.offsetWidth}px`;
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        }
     });
 
+    // Close sidebar when clicking outside on small screens
     document.addEventListener('click', (e) => {
-        if (!sidebar.contains(e.target) && 
+        if (window.innerWidth <= 767 && 
+            !sidebar.contains(e.target) && 
             !toggleBtn.contains(e.target) && 
-            window.innerWidth <= 768) {
+            sidebar.classList.contains('active')) {
             sidebar.classList.remove('active');
-            container.classList.remove('sidebar-hidden');
         }
     });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            sidebar.classList.remove('active');
-            container.classList.remove('sidebar-hidden');
-        }
+    
+    // Prevent click inside sidebar from closing it
+    sidebar.addEventListener('click', (e) => {
+        e.stopPropagation();
     });
 }
 

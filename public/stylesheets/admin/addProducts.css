@@ -27,7 +27,6 @@ body {
     flex-direction: column;
 }
 
-
 /* Sidebar */
 .sidebar {
     width: var(--sidebar-width);
@@ -36,10 +35,26 @@ body {
     position: fixed;
     height: 100vh;
     z-index: 1000;
+    overflow-y: auto;
 }
 
 .sidebar.closed {
     transform: translateX(-100%);
+}
+
+/* Hamburger menu for mobile */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    background: var(--card-dark);
+    border: none;
+    color: var(--text-light);
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .admin-section {
@@ -80,8 +95,9 @@ body {
     background: var(--primary-color);
 }
 
-h2{
-    margin: 30px;;
+h2 {
+    margin: 30px;
+    text-align: center;
 }
 
 .upload-container {
@@ -92,6 +108,10 @@ h2{
     border: 1px solid var(--border-dark);
     border-radius: 8px;
     padding: 20px;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex-wrap: wrap;
 }
 
 .mini-boxes {
@@ -116,6 +136,7 @@ h2{
     cursor: pointer;
     background-color: var(--card-dark);
 }
+
 .mini-box img {
     width: 100%;
     height: 100%;
@@ -224,14 +245,16 @@ h2{
 .product-layout {
     display: flex;
     gap: 2rem;
-    margin: 20px;
+    margin: 20px auto;
     align-items: flex-start;
-    width:60%;
+    width: 90%;
+    max-width: 1200px;
+    flex-wrap: wrap;
 }
 
 .product-details {
     flex: 1;
-    
+    min-width: 300px;
 }
 
 .form-group {
@@ -263,6 +286,7 @@ textarea.form-control {
     margin-top: 2rem;
     border-top: 2px solid var(--border-dark);
     padding-top: 1rem;
+    width: 100%;
 }
 
 .variant-color {
@@ -276,14 +300,17 @@ textarea.form-control {
 .variant-content {
     display: flex;
     gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .variant-images {
-    width: 675px;
+    width: 100%;
+    max-width: 675px;
 }
 
 .variant-sizes {
     flex: 1;
+    min-width: 250px;
 }
 
 .color-header {
@@ -291,6 +318,7 @@ textarea.form-control {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .color-preview {
@@ -302,7 +330,7 @@ textarea.form-control {
 
 .sizes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 1rem;
 }
 
@@ -390,6 +418,8 @@ textarea.form-control {
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-dark);
     padding-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .modal-close {
@@ -409,6 +439,7 @@ textarea.form-control {
     border: 1px solid var(--border-dark);
     border-radius: 4px;
     padding: 1rem;
+    overflow-x: auto;
 }
 
 .crop-preview {
@@ -418,6 +449,7 @@ textarea.form-control {
     padding: 1rem;
     border: 1px solid var(--border-dark);
     border-radius: 4px;
+    flex-wrap: wrap;
 }
 
 .preview-mini {
@@ -430,20 +462,24 @@ textarea.form-control {
 
 .preview-mini img {
     height: 100%;
-    width:100;
+    width: 100%;
+    object-fit: cover;
 }
 
 .preview-large {
-    width: 500px;
-    height: 700px;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    aspect-ratio: 5/7;
     border: 2px solid var(--border-dark);
     border-radius: 8px;
     overflow: hidden;
 }
 
-.preview-large img{
-    width:100%;
-    height:100%;
+.preview-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .btn {
@@ -477,7 +513,9 @@ textarea.form-control {
     justify-content: flex-end;
     gap: 0.5rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
 }
+
 /* Color Picker Specific Styles */
 input[type="color"] {
     -webkit-appearance: none;
@@ -497,7 +535,7 @@ input[type="color"]::-webkit-color-swatch {
 
 .color-picker-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 0.5rem;
 }
 
@@ -505,10 +543,6 @@ input[type="color"]::-webkit-color-swatch {
     width: 100%;
 }
 
-/* Add these to your existing modal styles if needed */
-.modal-header {
-    margin-bottom: 1.5rem;
-}
 .form-footer {
     position: sticky;
     bottom: 0;
@@ -516,14 +550,17 @@ input[type="color"]::-webkit-color-swatch {
     padding: 1rem;
     border-top: 1px solid var(--border-dark);
     margin-top: 2rem;
-    width:60%;
+    width: 100%;
+    max-width: 1200px;
 }
 
 .form-footer .button-group {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+    flex-wrap: wrap;
 }
+
 .tags-section {
     margin-top: 1rem;
     padding-top: 1rem;
@@ -565,10 +602,12 @@ input[type="color"]::-webkit-color-swatch {
     display: flex;
     gap: 0.5rem;
     margin-top: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .tag-input {
     flex: 1;
+    min-width: 200px;
     padding: 0.5rem;
     border: 1px solid var(--border-dark);
     border-radius: 4px;
@@ -588,6 +627,7 @@ input[type="color"]::-webkit-color-swatch {
 .add-tag-form button:hover {
     background: #4f46e5;
 }
+
 /* Webkit browsers (Chrome, Safari, newer Edge) */
 ::-webkit-scrollbar {
     width: var(--scrollbar-width);
@@ -612,4 +652,183 @@ input[type="color"]::-webkit-color-swatch {
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
+    .product-layout {
+        width: 95%;
+    }
+    
+    .preview-container {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        aspect-ratio: 5/7;
+    }
+}
+
+@media (max-width: 992px) {
+    .upload-container {
+        justify-content: center;
+    }
+    
+    .preview-container {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0px;
+    }
+    
+    .sidebar {
+        width: 75%;
+        max-width: 300px;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+    
+    .product-layout {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    
+    h2 {
+        margin: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .variant-content {
+        flex-direction: column;
+    }
+    
+    .variant-images {
+        width: 100%;
+    }
+    
+    .modal-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .upload-container {
+        padding: 10px;
+        gap: 1rem;
+    }
+    
+    .mini-boxes {
+        height: auto;
+        max-height: 300px;
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    
+    .preview-container {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 5/7;
+    }
+    
+    .color-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .sizes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+    
+    .button-group {
+        justify-content: center;
+    }
+}
+
+/* Touch-specific improvements */
+@media (hover: none) {
+    .mini-box .overlay {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .nav-item {
+        padding: 15px 20px; /* Larger touch target */
+    }
+    
+    .btn, 
+    .form-control,
+    select {
+        padding: 0.75rem; /* Larger touch targets for inputs */
+    }
+}
+
+/* For very small screens */
+@media (max-width: 360px) {
+    h2 {
+        font-size: 1.25rem;
+        margin: 15px 10px;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 14px;
+    }
+}
+
+/* For landscape orientation on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        overflow-y: auto;
+    }
+    
+    .preview-container,
+    .preview-large {
+        height: 300px;
+        aspect-ratio: auto;
+    }
+    
+    .mini-boxes {
+        max-height: 200px;
+    }
+}
+
+/* For print media */
+@media print {
+    .sidebar,
+    .menu-toggle,
+    .btn-secondary,
+    .add-variant,
+    .remove-variant,
+    .overlay,
+    .add-box {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .card-dark,
+    .preview-container,
+    .variant-color,
+    .form-control {
+        background: white !important;
+        color: black !important;
+        border-color: #ddd !important;
+    }
 }

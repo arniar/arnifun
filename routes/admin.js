@@ -13,10 +13,10 @@ const salesRouter = require('./admin/sales');
 const bannerRouter = require('./admin/banner');
 
 
-const authMiddleware = require('../middlewares/adminLoginCheck');
+// const authMiddleware = require('../middlewares/adminLoginCheck');
 
-// Apply middleware to all routes
- router.use(authMiddleware);
+// // Apply middleware to all routes
+//  router.use(authMiddleware);
 
 router.use('/dashboard', dashboardRouter);
 router.use('/products', productsRouter);

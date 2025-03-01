@@ -33,8 +33,14 @@
     </style>
 </head>
 <body>
+    <div class="hamburger" id="hamburger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    
     <div class="container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <img src="/images/common/logo.png" alt="Logo">
             </div>
@@ -43,7 +49,7 @@
                 <span>Admin</span>
             </div>
             <ul class="nav-links">
-                <li><a href="/admin/dashboard" >Dashboard</a></li>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
                 <li><a href="/admin/products" class="active">Products</a></li>
                 <li><a href="/admin/maincategories">Category</a></li>
                 <li><a href="/admin/orders">Orders</a></li>
@@ -53,7 +59,7 @@
                 <li><a href="/admin/banner">Banner</a></li>
             </ul>
         </aside>
-
+        
         <main class="main-content">
             <div class="header">
                 <h1 class="page-title">Product Details</h1>
@@ -62,24 +68,25 @@
                 </div>
                 <a href="/admin/products/addProduct"><button class="add-product-btn" id="add-product">+ Add Product</button></a>
             </div>
-            <table class="product-table">
-                <thead>
-                    <tr>
-                        <th>Products</th>
-                        <th>Product Id</th>
-                        <th>Price</th>
-                        <th>Discount Price</th>
-                        <th>Status</th>
-                        <th>Description</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody">
-                    <% products.forEach((product) => { %>
-                        <!-- Your existing product rows code -->
-                    <% }) %>
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Products</th>
+                            <th>Product Id</th>
+                            <th>Price</th>
+                            <th>Discount Price</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        <!-- Product rows will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination will be added here -->
         </main>
     </div>
     <script src="/javascripts/admin/products.js"></script>
