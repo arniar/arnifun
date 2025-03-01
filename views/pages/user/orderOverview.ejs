@@ -146,7 +146,7 @@
                     </div>
 
                     <div class="action-buttons">
-                        <% if (order.paymentMethod === 'cod' && order.status !== 'Delivered' && order.status !== 'Refund Requested' && order.status !== 'Payment Failed' && order.status !== 'Cancelled') { %>
+                        <% if (order.paymentMethod === 'cod' && order.status !== 'Delivered' && order.status !== 'Refund Requested' && order.status !== 'Payment Failed' && order.status !== 'Cancelled' && order.status !== 'Returned') { %>
                             <button class="btn btn-secondary" onclick="cancelOrder('<%= order.orderId %>')">Cancel Order</button>
                         <% } else if (order.status === 'Payment Failed') { %>
                             <button class="btn btn-warning" onclick="retryPayment('<%= order.orderId %>')">Retry Payment</button>
