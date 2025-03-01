@@ -7,6 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/user/orderOverview.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <canvas id="backgroundCanvas"></canvas>
@@ -15,21 +16,6 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="#" class="logo">ARNI</a>
-            <div class="nav-links">
-                <a href="/">Home</a>
-                <a href="/shop">Shop</a>
-                <% categoriesWithSubs.forEach(function(category) { %>
-                    <a href="/subcategories?main=<%= category._id %>" 
-                       data-category="true"
-                       data-categories="<%= JSON.stringify(categoriesWithSubs) %>">
-                        <%= category.mainCategoryName.split(' ')
-                            .map((word, index) => index === 0 ? 
-                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() : 
-                                word.toLowerCase())
-                            .join(' ') %>
-                    </a>
-                <% }); %>
-            </div>
             <div class="nav-right">
                 <a href="/users/pI">
                     <i class="fas fa-user-circle"></i> Profile

@@ -6,6 +6,7 @@
     <title>ARNI - Profile Pages</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
     <link rel="stylesheet" href="/stylesheets/user/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .orders-table {
             width: 100%;
@@ -122,10 +123,10 @@
                         <table class="orders-table">
                             <thead>
                                 <tr>
-                                    <th>No</th>
+
                                     <th>Name</th>
                                     <th>Price</th>
-                                    <th>Quantity</th>
+
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -133,15 +134,13 @@
                             <tbody>
                                 <% orders.forEach((order, index) => { %>
                                     <tr>
-                                        <td><%= index + 1 %></td>
                                         <td>
                                             <div style="display: flex; gap: 1rem; align-items: center;">
                                                 <img src="<%= order.image %>" alt="Product" class="order-image">
                                                 <span><%= order.name %></span>
                                             </div>
                                         </td>
-                                        <td>₹<%= order.price %></td>
-                                        <td><%= order.quantity %></td>
+                                        <td>₹<%= order.price*order.quantity %></td>
                                         <td><%= order.status %></td>
                                         <td>
                                             <% if (order.status !== 'Cancelled' && order.status !== 'Returned') { %>

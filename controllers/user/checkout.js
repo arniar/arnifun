@@ -466,21 +466,6 @@ exports.placeOrder = async (req, res) => {
             return res.status(400).json({ error: 'Invalid shipping address' });
         }
 
-        // Check stock before processing orders
-        for (const cartItem of cart.items) {
-            const variant = await Variant.findById(cartItem.variantId);
-            if (!variant) {
-                return res.status(400).json({ error: `Variant not found: ${cartItem.variantId}` });
-            }
-
-            if (!variant.sizes[cartItem.size] || variant.sizes[cartItem.size] < cartItem.quantity) {
-                return res.status(400).json({
-                    stock: "out",
-                    error: 'Some items in your cart are out of stock'
-                });
-            }
-        }
-
         // Calculate coupon discount if applied
         let couponDiscount = 0;
         if (cart.couponApplied) {
@@ -497,17 +482,32 @@ exports.placeOrder = async (req, res) => {
         }
 
         // Calculate discount per product type (not per quantity)
-        // Each unique product in cart gets an equal share of the discount
         const numberOfUniqueProducts = cart.items.length;
         const discountPerProductType = numberOfUniqueProducts > 0 ? (couponDiscount / numberOfUniqueProducts) : 0;
-
-        const orderPromises = cart.items.map(async (cartItem) => {
+        
+        // Create separate orders for each cart item - one at a time
+        const orders = [];
+        
+        for (const cartItem of cart.items) {
             const variant = await Variant.findById(cartItem.variantId);
+            if (!variant) {
+                return res.status(400).json({ error: `Variant not found: ${cartItem.variantId}` });
+            }
+
+            if (!variant.sizes[cartItem.size] || variant.sizes[cartItem.size] < cartItem.quantity) {
+                return res.status(400).json({
+                    stock: "out",
+                    error: 'Some items in your cart are out of stock'
+                });
+            }
+
             const product = await Product.findById(variant.productId);
-            
             if (!product) {
                 throw new Error(`Product not found for variant: ${cartItem.variantId}`);
             }
+
+            // Generate a unique orderId BEFORE creating the order
+            const orderId = await Order.generateOrderId();
 
             // Update variant stock
             const updateQuery = {};
@@ -526,19 +526,18 @@ exports.placeOrder = async (req, res) => {
             const variantImage = variant.images?.[0] || product.image;
             const originalPrice = product.discountPrice || product.price;
             
-            // Apply the coupon discount to the product (not multiplied by quantity)
-            // The discount is applied to the unit price
+            // Apply the coupon discount to the product
             const discountPerUnit = discountPerProductType / cartItem.quantity;
             const priceAfterCoupon = Math.max(0, originalPrice - discountPerUnit);
 
             const orderData = {
+                orderId: orderId, // Use the pre-generated orderId
                 userId: _id_,
                 name: product.name,
                 image: variantImage,
                 price: priceAfterCoupon,
                 originalPrice: originalPrice,
-                couponDiscountApplied: discountPerProductType, // Total discount for this product type
-                discountPerUnit: discountPerUnit, // Discount applied to each unit
+                couponDiscountApplied: discountPerProductType,
                 productId: product.productId,
                 quantity: cartItem.quantity,
                 size: cartItem.size,
@@ -560,10 +559,9 @@ exports.placeOrder = async (req, res) => {
                 orderData.paymentDetails = paymentDetails;
             }
 
-            return Order.create(orderData);
-        });
-
-        const orders = await Promise.all(orderPromises);
+            const order = await Order.create(orderData);
+            orders.push(order._id);
+        }
 
         // Clear cart after successful order creation
         await Cart.findOneAndUpdate(
@@ -581,7 +579,7 @@ exports.placeOrder = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Orders placed successfully',
-            orders: orders.map(order => order._id)
+            orders: orders
         });
 
     } catch (error) {

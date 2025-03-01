@@ -201,7 +201,7 @@ function renderPagination() {
     const paginationElement = document.getElementById('pagination');
     paginationElement.innerHTML = '';
 
-    if (totalPages <= 1) return;
+    // if (totalPages <= 1) return;
 
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
