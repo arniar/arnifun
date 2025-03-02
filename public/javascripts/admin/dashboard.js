@@ -12,13 +12,20 @@ let salesChart = null;
 function handleResponsiveLayout() {
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
+    const toggleBtn = document.querySelector('.toggle-btn');
     
     function adjustLayout() {
         if (window.innerWidth <= 767) {
-            sidebar.classList.remove('active');
+            // On mobile, don't adjust margin automatically
             mainContent.style.marginLeft = '0';
+            // Show toggle button
+            toggleBtn.style.display = 'flex';
         } else {
+            // On desktop, always show sidebar
+            sidebar.classList.add('active');
             mainContent.style.marginLeft = `${sidebar.offsetWidth}px`;
+            // Hide toggle button
+            toggleBtn.style.display = 'none';
         }
     }
     
@@ -73,17 +80,25 @@ async function loadTopCategories() {
 
 async function initSalesChart() {
     const timeframeSelect = document.getElementById('timeframe-select');
+    const chartContainer = document.querySelector('.chart-container');
     
     async function updateChart() {
         try {
             const response = await fetch(`/admin/dashboard/sales-chart?timeframe=${timeframeSelect.value}`);
             const chartData = await response.json();
 
-            const ctx = document.getElementById('salesChart').getContext('2d');
+            // Get the canvas context
+            const canvas = document.getElementById('salesChart');
+            const ctx = canvas.getContext('2d');
             
+            // Destroy previous chart instance if it exists
             if (salesChart) {
                 salesChart.destroy();
             }
+            
+            // Ensure canvas dimensions match container
+            canvas.width = chartContainer.clientWidth;
+            canvas.height = chartContainer.clientHeight;
             
             // Responsive font size based on screen width
             const fontSize = window.innerWidth < 768 ? 10 : 12;
@@ -95,8 +110,8 @@ async function initSalesChart() {
                     datasets: [{
                         label: 'Sales (₹)',
                         data: chartData.map(d => d.value),
-                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(234, 179, 8, 0.8)',
+                        borderColor: '#eab308',
                         borderWidth: 1,
                         borderRadius: 4
                     }]
@@ -132,7 +147,9 @@ async function initSalesChart() {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: '#374151' },
+                            grid: { 
+                                color: 'rgba(255, 255, 255, 0.1)' 
+                            },
                             ticks: {
                                 color: '#f3f4f6',
                                 font: {
@@ -142,7 +159,9 @@ async function initSalesChart() {
                             }
                         },
                         x: {
-                            grid: { color: '#374151' },
+                            grid: { 
+                                color: 'rgba(255, 255, 255, 0.1)' 
+                            },
                             ticks: { 
                                 color: '#f3f4f6',
                                 font: {
@@ -172,10 +191,17 @@ async function initSalesChart() {
     // Handle chart resizing when window resizes
     window.addEventListener('resize', () => {
         if (salesChart) {
+            // Resize the canvas to match container
+            const canvas = document.getElementById('salesChart');
+            canvas.width = chartContainer.clientWidth;
+            canvas.height = chartContainer.clientHeight;
+            
+            // Update the chart
             salesChart.resize();
         }
     });
     
+    // Initial chart update
     updateChart();
 }
 
@@ -184,18 +210,33 @@ function initSidebarToggle() {
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
 
+    // Function to update toggle button visibility
+    function updateToggleButtonVisibility() {
+        if (window.innerWidth <= 767) {
+            // On mobile, show toggle button only when sidebar is hidden
+            toggleBtn.style.display = sidebar.classList.contains('active') ? 'none' : 'flex';
+        } else {
+            // On desktop, always hide toggle button
+            toggleBtn.style.display = 'none';
+        }
+    }
+
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sidebar.classList.toggle('active');
         
-        // Only adjust margin on larger screens
-        if (window.innerWidth > 767) {
-            if (sidebar.classList.contains('active')) {
-                mainContent.style.marginLeft = `${sidebar.offsetWidth}px`;
-            } else {
-                mainContent.style.marginLeft = '0';
-            }
+        // Adjust margin based on sidebar state
+        if (window.innerWidth <= 767) {
+            // On mobile, just toggle the sidebar visibility without adjusting margin
+            // The sidebar will overlay on top of content
+        } else {
+            // On larger screens, adjust the margin
+            mainContent.style.marginLeft = sidebar.classList.contains('active') ? 
+                `${sidebar.offsetWidth}px` : '0';
         }
+        
+        // Update toggle button visibility
+        updateToggleButtonVisibility();
     });
 
     // Close sidebar when clicking outside on small screens
@@ -205,6 +246,7 @@ function initSidebarToggle() {
             !toggleBtn.contains(e.target) && 
             sidebar.classList.contains('active')) {
             sidebar.classList.remove('active');
+            updateToggleButtonVisibility();
         }
     });
     
@@ -212,6 +254,12 @@ function initSidebarToggle() {
     sidebar.addEventListener('click', (e) => {
         e.stopPropagation();
     });
+    
+    // Update toggle button visibility on resize
+    window.addEventListener('resize', updateToggleButtonVisibility);
+    
+    // Initial setup
+    updateToggleButtonVisibility();
 }
 
 function initLogout() {

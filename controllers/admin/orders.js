@@ -212,8 +212,9 @@ exports.rejectRefund = async (req, res) => {
 // Get order details by ID
 exports.getOrderDetails = async (req, res) => {
     try {
-        const orderId = req.params.id;
-        const order = await Order.findOne({ orderId: orderId });
+        console.log('details')
+        let  orderId = req.params.id;
+        const order = await Order.findOne({ _id: orderId });
         
         if (!order) {
             return res.status(404).json({

@@ -339,3 +339,52 @@ class SalesReport {
 document.addEventListener('DOMContentLoaded', () => {
     new SalesReport();
 });
+
+// Add this to your existing JavaScript file or replace the existing hamburger menu script
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const toggleSidebarBtn = document.querySelector('.toggle-sidebar-btn');
+
+    // Toggle sidebar for mobile
+    hamburgerMenu.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    // Toggle sidebar collapse state (for desktop)
+    if (toggleSidebarBtn) {
+        toggleSidebarBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+    }
+
+    // Close sidebar when clicking outside or on a link (mobile)
+    overlay.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    // Close sidebar when clicking on a navigation link (mobile)
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Only close the sidebar on mobile
+            if (window.innerWidth <= 992) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    });
+
+    // Handle window resize events
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+            // Reset mobile classes when returning to desktop size
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    });
+});

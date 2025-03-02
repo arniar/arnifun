@@ -193,6 +193,8 @@ function updateOrdersTable(orders) {
     
     orders.forEach(order => {
         const row = document.createElement('tr');
+        // Add the data-order-id attribute to the row itself
+        row.setAttribute('data-order-id', order._id);
         row.innerHTML = `
             <td>${order.orderId}</td>
             <td>
@@ -241,14 +243,6 @@ function updateOrdersTable(orders) {
         ordersTableBody.appendChild(row);
     });
     
-    attachChangeStatusListeners();
-    attachRefundListeners();
-    attachInfoListeners();
-
-    // After appending all rows
-    ordersTableBody.appendChild(row);
-    
-    // Call at the end of the function
     attachRowClickListeners();
     attachChangeStatusListeners();
     attachRefundListeners();
@@ -260,8 +254,8 @@ function attachRowClickListeners() {
     
     tableRows.forEach(row => {
         row.addEventListener('click', async function() {
-            // Get the order ID from the first cell
-            const orderId = this.cells[0].textContent.trim();
+            
+            const orderId = this.getAttribute('data-order-id');
             
             try {
                 // Fetch the order details
@@ -431,7 +425,9 @@ function attachInfoListeners() {
 // Attach change status listeners
 function attachChangeStatusListeners() {
     document.querySelectorAll('.change-status-btn').forEach(button => {
-        button.addEventListener('click', async function() {
+        button.addEventListener('click', async function(e) {
+            // Add stopPropagation to prevent row click from triggering
+            e.stopPropagation();
             const orderId = this.getAttribute('data-order-id');
             try {
                 const result = await Swal.fire({

@@ -7,78 +7,7 @@
     <title>Coupon Management</title>
     <link rel="stylesheet" href="/stylesheets/admin/coupons.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
-    <style>
-          /* Hamburger Menu Styles */
-    .hamburger-menu {
-        display: none;
-        flex-direction: column;
-        justify-content: space-around;
-        width: 2rem;
-        height: 2rem;
-        cursor: pointer;
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        z-index: 10;
-    }
-
-    .hamburger-menu div {
-        width: 2rem;
-        height: 0.25rem;
-        background-color: var(--primary-color);
-        border-radius: 10px;
-        transition: all 0.3s linear;
-    }
-
-    .sidebar {
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .sidebar.active {
-        transform: translateX(0);
-    }
-
-    .overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 5;
-    }
-
-    /* Mobile Styles */
-    @media screen and (max-width: 768px) {
-        .hamburger-menu {
-            display: flex;
-            z-index: 10;
-        }
-    
-        .sidebar {
-            position: fixed;
-            transform: translateX(-100%);
-            z-index: 6;
-            width: 250px;
-            height: 100vh;
-            z-index: 10;
-        }
-
-        .main-content {
-            margin-left: 0;
-            width: 100%;
-        }
-
-        .header {
-            padding-left: 4rem;
-        }
-
-        .overlay.active {
-            display: block;
-        }
-    }
-    </style>
+   
 </head>
 <body>
     <div class="container">
@@ -95,12 +24,7 @@
             <div class="logo">
                 <img src="/images/common/logo.png" alt="Logo">
             </div>
-            <div class="sidebar-header">
-                <div class="admin-info">
-                    <div class="admin-avatar"></div>
-                    <span>Admin</span>
-                </div>
-            </div>
+            
             <ul class="nav-links">
                 <li><a href="/admin/dashboard">Dashboard</a></li>
                 <li><a href="/admin/products">Products</a></li>
