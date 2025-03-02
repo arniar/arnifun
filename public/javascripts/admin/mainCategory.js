@@ -1,6 +1,7 @@
 // DOM Elements
-const toggleBtn = document.querySelector('.toggle-btn');
-const sidebar = document.querySelector('.sidebar');
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
 const mainContent = document.querySelector('.main-content');
 const loader = document.querySelector('.loader');
 const container = document.querySelector('.container');
@@ -219,16 +220,27 @@ const catModal = {
         }
     }
 };
+
 // Sidebar toggle functionality
-toggleBtn?.addEventListener('click', () => {
-    sidebar?.classList.toggle('active');
+hamburgerMenu?.addEventListener('click', () => {
+    sidebar?.classList.toggle('sidebar-visible');
+    overlay?.classList.toggle('overlay-visible');
+    console.log("Hamburger clicked, sidebar visible:", sidebar?.classList.contains('sidebar-visible'));
+});
+
+// Close sidebar when clicking on overlay
+overlay?.addEventListener('click', () => {
+    sidebar?.classList.remove('sidebar-visible');
+    overlay?.classList.remove('overlay-visible');
+    console.log("Overlay clicked, sidebar closed");
 });
 
 // Close sidebar when clicking outside on mobile
 document.addEventListener('click', (e) => {
     if (window.innerWidth <= 768) {
-        if (!sidebar?.contains(e.target) && !toggleBtn?.contains(e.target)) {
-            sidebar?.classList.remove('active');
+        if (!sidebar?.contains(e.target) && !hamburgerMenu?.contains(e.target) && !e.target.closest('.cat-modal__container')) {
+            sidebar?.classList.remove('sidebar-visible');
+            overlay?.classList.remove('overlay-visible');
         }
     }
 });
@@ -236,8 +248,18 @@ document.addEventListener('click', (e) => {
 // Reset sidebar on window resize
 window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
-        sidebar?.classList.remove('active');
+        sidebar?.classList.remove('sidebar-visible');
+        overlay?.classList.remove('overlay-visible');
     }
+});
+
+// Close sidebar when clicking on a nav link
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', function() {
+        console.log("Nav link clicked");
+        sidebar?.classList.remove('sidebar-visible');
+        overlay?.classList.remove('overlay-visible');
+    });
 });
 
 // Initialize on DOM load
@@ -726,6 +748,7 @@ function initializeEditForm(form, btn) {
         }
     });
 }
+
 // Function to fetch and update table data
 async function fetchTableData() {
     try {

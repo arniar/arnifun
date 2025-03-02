@@ -587,3 +587,52 @@ body {
         display: block;
     }
 }
+
+/* Add these styles to your existing CSS */
+
+/* Order Details Modal */
+.order-details-modal .swal2-html-container {
+    text-align: left;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+.order-details h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--border-dark);
+    padding-bottom: 0.5rem;
+    margin-top: 1rem;
+}
+
+.order-details .product-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.order-details p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+/* Make rows clickable */
+#ordersTableBody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#ordersTableBody tr:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Style for status tags in details modal */
+.order-details .status-pending { color: #f59e0b; }
+.order-details .status-processing { color: #3b82f6; }
+.order-details .status-shipped { color: #6366f1; }
+.order-details .status-delivered { color: #10b981; }
+.order-details .status-cancelled { color: #ef4444; }
+.order-details .status-refund-requested { color: #f59e0b; }
+.order-details .status-refunded { color: #8b5cf6; }
+.order-details .status-returned { color: #ec4899; }

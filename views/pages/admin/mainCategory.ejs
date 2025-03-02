@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
     <style>
-            .swal2-popup {
+        .swal2-popup {
             background: var(--card-dark) !important;
             color: var(--text-light) !important;
             border: 1px solid var(--border-dark);
@@ -32,7 +32,7 @@
             color: var(--text-light) !important;
             border: 1px solid var(--border-dark) !important;
         }
-        
+
     </style>
 </head>
 <body> 
@@ -41,10 +41,19 @@
           <circle cx="25" cy="25" r="20"></circle>
           <circle cx="25" cy="25" r="20"></circle>
         </svg>
-      </div>
-    <button class="toggle-btn">☰</button>
+    </div>
+  
     <div class="container">
-        <aside class="sidebar">
+        <div class="hamburger-menu" id="hamburger-menu">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    
+        <!-- Overlay for when sidebar is open -->
+        <div class="overlay" id="overlay"></div>
+    
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <img src="/images/common/logo.png" alt="Logo">
             </div>
@@ -124,5 +133,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <script src="/javascripts/admin/mainCategory.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+
 </body>
 </html>

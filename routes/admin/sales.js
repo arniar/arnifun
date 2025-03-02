@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const salesController = require('../../controllers/admin/sales');
 
-
-
 // Render sales report page
 router.get('/', salesController.renderSalesReport);
 
@@ -20,15 +18,35 @@ router.get('/report', async (req, res) => {
 });
 
 // Download sales report
-router.get('/download', salesController.downloadReport);
+router.get('/download', async (req, res) => {
+    try {
+        const { startDate, endDate, format } = req.query;
+        
+        // Check if there are sales in the selected period
+        const salesData = await salesController.getProductSales({ startDate, endDate });
+        
+        // If no sales, return specific status code to trigger alert on frontend
+        if (!salesData.products || salesData.products.length === 0 || salesData.stats.totalSales === 0) {
+            return res.status(204).json({ message: 'No sales data available for the selected period' });
+        }
+        
+        // If there are sales, proceed with download
+        return salesController.downloadReport(req, res);
+    } catch (error) {
+        console.error('Error preparing download:', error);
+        res.status(500).json({ error: 'Failed to download report' });
+    }
+});
 
 // Get period-specific reports
 router.get('/daily', async (req, res) => {
     try {
         const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
         const salesData = await salesController.getProductSales({
-            startDate: today.toISOString(),
-            endDate: today.toISOString()
+            startDate: formattedDate,
+            endDate: formattedDate
         });
         res.json(salesData);
     } catch (error) {
@@ -40,12 +58,14 @@ router.get('/daily', async (req, res) => {
 router.get('/monthly', async (req, res) => {
     try {
         const today = new Date();
+        // First day of current month
         const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        // Last day of current month (setting day to 0 of next month gives last day of current month)
         const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         
         const salesData = await salesController.getProductSales({
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0]
         });
         res.json(salesData);
     } catch (error) {
@@ -61,8 +81,8 @@ router.get('/yearly', async (req, res) => {
         const endDate = new Date(today.getFullYear(), 11, 31);
         
         const salesData = await salesController.getProductSales({
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0]
         });
         res.json(salesData);
     } catch (error) {

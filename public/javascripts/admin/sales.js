@@ -1,10 +1,12 @@
 class SalesReport {
     constructor() {
         this.initializeElements();
+        this.preventFutureDates();
         this.attachEventListeners();
         this.loadInitialData();
         this.downloadModal = document.getElementById('downloadModal');
         this.initializeDownloadModal();
+        this.loadSweetAlert();
     }
 
     initializeElements() {
@@ -18,9 +20,26 @@ class SalesReport {
         this.loadingOverlay.className = 'loading-overlay';
     }
 
+    // Prevent future date selection
+    preventFutureDates() {
+        const today = new Date().toISOString().split('T')[0];
+        this.startDate.setAttribute('max', today);
+        this.endDate.setAttribute('max', today);
+    }
+
+    loadSweetAlert() {
+        // Check if SweetAlert is already loaded
+        if (typeof Swal === 'undefined') {
+            // Create script element for SweetAlert
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+            document.head.appendChild(script);
+        }
+    }
+
     attachEventListeners() {
         this.applyDateBtn.addEventListener('click', () => this.loadSalesData());
-        this.downloadBtn.addEventListener('click', () => this.showDownloadModal());
+        this.downloadBtn.addEventListener('click', () => this.handleDownloadClick());
         this.periodBtns.forEach(btn => {
             btn.addEventListener('click', (e) => this.handlePeriodFilter(e));
         });
@@ -29,6 +48,19 @@ class SalesReport {
             const expandBtn = e.target.closest('.expand-btn');
             if (expandBtn) this.handleRowExpand(expandBtn);
         });
+
+        // Add validation on date input change
+        this.startDate.addEventListener('change', () => this.validateDateRange());
+        this.endDate.addEventListener('change', () => this.validateDateRange());
+    }
+
+    // Validate that start date is not after end date
+    validateDateRange() {
+        if (this.startDate.value && this.endDate.value) {
+            if (new Date(this.startDate.value) > new Date(this.endDate.value)) {
+                this.endDate.value = this.startDate.value;
+            }
+        }
     }
 
     async loadInitialData() {
@@ -65,6 +97,13 @@ class SalesReport {
             const data = await response.json();
             this.renderTable(data.products);
             this.updateStats(data.stats);
+
+            // Store current sales data status
+            this.hasSalesData = data.products && data.products.length > 0 && data.stats.totalSales > 0;
+            
+            // Enable/disable download button based on sales data
+            this.downloadBtn.disabled = !this.hasSalesData;
+            this.downloadBtn.classList.toggle('btn-disabled', !this.hasSalesData);
         } catch (error) {
             console.error('Error loading sales data:', error);
             this.showError('Failed to load sales data. Please try again.');
@@ -75,6 +114,17 @@ class SalesReport {
 
     renderTable(products) {
         this.salesTableBody.innerHTML = '';
+        
+        if (!products || products.length === 0) {
+            // Show no data message
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="5" class="text-center">No sales data available for the selected period</td>
+            `;
+            this.salesTableBody.appendChild(emptyRow);
+            return;
+        }
+        
         products.forEach(product => {
             const row = this.createProductRow(product);
             this.salesTableBody.appendChild(row);
@@ -148,17 +198,22 @@ class SalesReport {
         this.startDate.value = this.formatDate(dates.start);
         this.endDate.value = this.formatDate(dates.end);
         
+        // Highlight active period button
+        this.periodBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.period === period);
+        });
+        
         await this.loadSalesData();
     }
 
     calculatePeriodDates(period) {
         const today = new Date();
         let start = new Date();
-        let end = new Date();
+        let end = new Date(today);
 
         switch (period) {
             case 'daily':
-                start = today;
+                start = new Date(today);
                 break;
             case 'monthly':
                 start = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -167,6 +222,7 @@ class SalesReport {
             case 'yearly':
                 start = new Date(today.getFullYear(), 0, 1);
                 end = new Date(today.getFullYear(), 11, 31);
+                if (end > today) end = today; // Ensure we don't include future dates
                 break;
         }
 
@@ -183,16 +239,34 @@ class SalesReport {
         document.getElementById('totalUnits').textContent = stats.totalUnits;
     }
 
+    handleDownloadClick() {
+        // Check if there's sales data before showing the download modal
+        if (!this.hasSalesData) {
+            this.showNoSalesAlert();
+            return;
+        }
+        
+        this.showDownloadModal();
+    }
+
+    showNoSalesAlert() {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'No Sales Data',
+                text: 'There is no sales data available for the selected period.',
+                icon: 'info',
+                confirmButtonColor: '#6366f1'
+            });
+        } else {
+            alert('No sales data available for the selected period.');
+        }
+    }
+
     showDownloadModal() {
         this.downloadModal.classList.add('active');
     }
 
     initializeDownloadModal() {
-        // Only show the modal when clicking download button
-        this.downloadBtn.addEventListener('click', () => {
-            this.showDownloadModal();
-        });
-
         // Close modal when clicking outside
         this.downloadModal.addEventListener('click', (e) => {
             if (e.target === this.downloadModal) {
@@ -221,6 +295,13 @@ class SalesReport {
             });
 
             const response = await fetch(`/admin/sales/download?${params}`);
+            
+            // Check for 204 status (no content)
+            if (response.status === 204) {
+                this.showNoSalesAlert();
+                return;
+            }
+            
             if (!response.ok) throw new Error('Failed to download report');
             
             const blob = await response.blob();
@@ -241,7 +322,16 @@ class SalesReport {
     }
 
     showError(message) {
-        alert(message);
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#6366f1'
+            });
+        } else {
+            alert(message);
+        }
     }
 }
 

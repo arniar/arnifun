@@ -244,6 +244,116 @@ function updateOrdersTable(orders) {
     attachChangeStatusListeners();
     attachRefundListeners();
     attachInfoListeners();
+
+    // After appending all rows
+    ordersTableBody.appendChild(row);
+    
+    // Call at the end of the function
+    attachRowClickListeners();
+    attachChangeStatusListeners();
+    attachRefundListeners();
+    attachInfoListeners();
+}
+
+function attachRowClickListeners() {
+    const tableRows = document.querySelectorAll('#ordersTableBody tr');
+    
+    tableRows.forEach(row => {
+        row.addEventListener('click', async function() {
+            // Get the order ID from the first cell
+            const orderId = this.cells[0].textContent.trim();
+            
+            try {
+                // Fetch the order details
+                const response = await fetch(`/admin/orders/${orderId}/details`);
+                if (!response.ok) throw new Error('Failed to fetch order details');
+                
+                const orderData = await response.json();
+                const order = orderData.order;
+                
+                // Format payment details
+                let paymentDetailsHtml = '';
+                if (order.paymentDetails) {
+                    const paymentKeys = Object.keys(order.paymentDetails);
+                    paymentDetailsHtml = paymentKeys.map(key => 
+                        `<p><strong>${key}:</strong> ${order.paymentDetails[key]}</p>`
+                    ).join('');
+                }
+                
+                // Format coupon information
+                let couponHtml = 'No coupon applied';
+                if (order.couponApplied) {
+                    couponHtml = `
+                        <p><strong>Coupon Code:</strong> ${order.couponApplied}</p>
+                        <p><strong>Discount Amount:</strong> ₹${order.couponDiscountApplied.toLocaleString()}</p>
+                    `;
+                }
+                
+                // Create the modal with SweetAlert2
+                Swal.fire({
+                    title: `Order Details - ${order.orderId}`,
+                    html: `
+                        <div class="order-details">
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Customer Information</h3>
+                                <p><strong>User ID:</strong> ${order.userId}</p>
+                            </div>
+                            
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Product Information</h3>
+                                <div class="product-info">
+                                    <img src="${order.image}" alt="${order.name}" class="product-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    <p><strong>Product:</strong> ${order.name}</p>
+                                </div>
+                                <p><strong>Product ID:</strong> ${order.productId}</p>
+                                <p><strong>Size:</strong> ${order.size}</p>
+                                <p><strong>Quantity:</strong> ${order.quantity}</p>
+                                <p><strong>Original Price:</strong> ₹${order.originalPrice ? order.originalPrice.toLocaleString() : order.price.toLocaleString()}</p>
+                                <p><strong>Final Price:</strong> ₹${order.price.toLocaleString()}</p>
+                            </div>
+                            
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Order Information</h3>
+                                <p><strong>Order Date:</strong> ${formatDate(order.orderDate)}</p>
+                                <p><strong>Status:</strong> <span class="status-${order.status.toLowerCase().replace(' ', '-')}">${order.status}</span></p>
+                                <p><strong>Previous Status:</strong> ${order.previousStatus}</p>
+                                ${order.reasonForRefund ? `<p><strong>Refund Reason:</strong> ${order.reasonForRefund}</p>` : ''}
+                            </div>
+                            
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Payment Information</h3>
+                                <p><strong>Payment Method:</strong> ${order.paymentMethod.toUpperCase()}</p>
+                                <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
+                                ${paymentDetailsHtml}
+                            </div>
+                            
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Coupon Information</h3>
+                                ${couponHtml}
+                            </div>
+                            
+                            <div class="mb-4 text-left">
+                                <h3 class="mb-2">Shipping Address</h3>
+                                <p>${order.address.street},</p>
+                                <p>${order.address.city}, ${order.address.state}</p>
+                                <p>${order.address.postalCode}, ${order.address.country || 'India'}</p>
+                            </div>
+                        </div>
+                    `,
+                    width: '600px',
+                    background: '#1f2937',
+                    color: '#f3f4f6',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        container: 'order-details-modal'
+                    }
+                });
+            } catch (error) {
+                handleError(error, 'Order Details Error');
+            }
+        });
+    });
 }
 
 // Update pagination controls

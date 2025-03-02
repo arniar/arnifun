@@ -7,10 +7,91 @@
     <title>Coupon Management</title>
     <link rel="stylesheet" href="/stylesheets/admin/coupons.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css" rel="stylesheet">
+    <style>
+          /* Hamburger Menu Styles */
+    .hamburger-menu {
+        display: none;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 2rem;
+        height: 2rem;
+        cursor: pointer;
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        z-index: 10;
+    }
+
+    .hamburger-menu div {
+        width: 2rem;
+        height: 0.25rem;
+        background-color: var(--primary-color);
+        border-radius: 10px;
+        transition: all 0.3s linear;
+    }
+
+    .sidebar {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 5;
+    }
+
+    /* Mobile Styles */
+    @media screen and (max-width: 768px) {
+        .hamburger-menu {
+            display: flex;
+            z-index: 10;
+        }
+    
+        .sidebar {
+            position: fixed;
+            transform: translateX(-100%);
+            z-index: 6;
+            width: 250px;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .header {
+            padding-left: 4rem;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    }
+    </style>
 </head>
 <body>
     <div class="container">
-        <aside class="sidebar">
+        <div class="hamburger-menu" id="hamburger-menu">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    
+        <!-- Overlay for when sidebar is open -->
+        <div class="overlay" id="overlay"></div>
+    
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <img src="/images/common/logo.png" alt="Logo">
             </div>
@@ -124,6 +205,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
 
     <script src="/javascripts/admin/coupons.js"></script>
+
+    <!-- Hamburger Menu Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        // Toggle sidebar
+        hamburgerMenu.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside or on a link
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Close sidebar when clicking on a navigation link
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        });
+    });
+</script>
    
 </body>
 </html>

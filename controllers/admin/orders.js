@@ -208,3 +208,29 @@ exports.rejectRefund = async (req, res) => {
         });
     }
 }
+
+// Get order details by ID
+exports.getOrderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const order = await Order.findOne({ orderId: orderId });
+        
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            order
+        });
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching order details'
+        });
+    }
+};

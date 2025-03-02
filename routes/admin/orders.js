@@ -17,4 +17,8 @@ router.post('/:id/refund-A',OrderController.approveRefund)
 
 router.post('/:id/refund-R',OrderController.rejectRefund)
 
+
+// Add this route to your admin/orders.js routes file
+router.get('/:id/details', OrderController.getOrderDetails);
+
 module.exports = router;

@@ -142,7 +142,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Show modal when edit button is clicked
         editButtons.forEach((btn) => {
             btn.addEventListener('click', () => {
-                const overlay = btn.parentElement.querySelector('.cat-modal__overlay');
+                // Fix: Find the modal overlay within the same row, not as a child of the button parent
+                const row = btn.closest('tr');
+                const overlay = row.querySelector('.cat-modal__overlay');
                 if (overlay) {
                     overlay.classList.remove('active');
                 }
@@ -260,7 +262,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (!isConfirmed.isConfirmed) return;
 
-                    const id = btn.closest('tr').querySelector('.id').value;
+                    const row = btn.closest('tr');
+                    const id = row.querySelector('.id').value;
+                    
                     const response = await fetch('/admin/products/delete', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
@@ -305,7 +309,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (!result.isConfirmed) return;
 
-                    const id = btn.closest('tr').querySelector('.id').value;
+                    const row = btn.closest('tr');
+                    const id = row.querySelector('.id').value;
+                    
                     const response = await fetch('/admin/products/inactivate', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
@@ -350,7 +356,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (!result.isConfirmed) return;
 
-                    const id = btn.closest('tr').querySelector('.id').value;
+                    const row = btn.closest('tr');
+                    const id = row.querySelector('.id').value;
+                    
                     const response = await fetch('/admin/products/activate', {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
