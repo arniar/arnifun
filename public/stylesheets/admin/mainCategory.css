@@ -224,12 +224,20 @@ body {
     gap: 5px;
 }
 
+/* Table container for horizontal scrolling */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
 .categories-table {
     width: 100%;
     border-collapse: collapse;
     background: var(--card-dark);
     border-radius: 8px;
-   
+    min-width: 600px; /* Ensures the table maintains a minimum width */
 }
 
 .categories-table th,
@@ -237,7 +245,10 @@ body {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid var(--border-dark);
+    max-height: 150px;
+    overflow-y: auto;
 }
+
 .categories-table td{
     text-align: centre;
 }
@@ -246,6 +257,9 @@ body {
     background: var(--card-dark);
     font-weight: 600;
     color: #9ca3af;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .categories-table tr:hover {

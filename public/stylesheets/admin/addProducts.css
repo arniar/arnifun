@@ -450,7 +450,7 @@ textarea.form-control {
 
 /* Modal Styles */
 .modal {
-    display: flex;
+    display: none; /* Hide by default */
     justify-content: center;
     align-items: center;
     position: fixed;
@@ -463,7 +463,7 @@ textarea.form-control {
 }
 
 .modal.active {
-   display:none;
+    display: flex; /* Show when active class is applied */
 }
 
 .modal-content {
