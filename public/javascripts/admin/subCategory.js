@@ -11,24 +11,25 @@ const catModal = {
     cropper: null,
     isSubmitting: false,
     elements: {
-        overlay: document.getElementById('catModalOverlay5'),
+        overlay: document.getElementById('catModalOverlay'),
+        modalOverlay5: document.getElementById('catModalOverlay5'),
         form: document.getElementById('catCreateForm'),
         imageInput: document.getElementById('catImageInput'),
         cropImage: document.getElementById('catCropImage'),
         croppedData: document.getElementById('catCroppedData'),
-        nameInput: document.getElementById('Name'),
+        nameInput: document.querySelector('#catModalOverlay5 #Name'),
         previewContainer: document.querySelector('.cat-crop__preview')
     },
 
     open() {
         if (this.elements.overlay) {
-            this.elements.overlay.classList.remove('active');
+            this.elements.overlay.classList.add('cat-modal__overlay--active');
         }
     },
 
     close() {
-        if (this.elements.overlay) {
-            this.elements.overlay.classList.add('active');
+        if (this.elements.modalOverlay5) {
+            this.elements.modalOverlay5.classList.add('active');
         }
         this.resetForm();
     },
@@ -88,12 +89,6 @@ const catModal = {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.close());
         }
-
-        // Add event listener for add category button
-        const addCategoryBtn = document.querySelector('.add-category-btn');
-        if (addCategoryBtn) {
-            addCategoryBtn.addEventListener('click', () => this.open());
-        }
     },
 
     handleImageSelect(e) {
@@ -121,7 +116,7 @@ const catModal = {
                 this.cropper = new Cropper(this.elements.cropImage, {
                     aspectRatio: 1,
                     viewMode: 2,
-                    preview: this.elements.previewContainer,
+                    preview: '.cat-crop__preview',
                     responsive: true,
                     autoCropArea: 0.8,
                     cropBoxResizable: true,
@@ -161,32 +156,15 @@ const catModal = {
         try {
             this.isSubmitting = true;
             
-            const loaderElement = document.querySelector('.loader');
-            const containerElement = document.querySelector('.container');
-            
-            if (loaderElement) loaderElement.classList.remove('active');
-            if (containerElement) containerElement.classList.add('active');
+            if (loader) loader.classList.remove('active');
+            if (container) container.classList.add('active');
 
-            let croppedDataUrl;
-            try {
-                const canvas = this.cropper.getCroppedCanvas();
-                if (!canvas) {
-                    throw new Error('Failed to crop image');
-                }
-                croppedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            } catch (cropError) {
-                console.error('Cropping error:', cropError);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to process the image. Please try again.'
-                });
-                this.isSubmitting = false;
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
-                return;
+            const canvas = this.cropper.getCroppedCanvas();
+            if (!canvas) {
+                throw new Error('Failed to crop image');
             }
 
+            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
             const payload = {
                 name: categoryName,
                 croppedImage: croppedDataUrl
@@ -236,11 +214,8 @@ const catModal = {
                 text: 'Error creating category. Please try again.'
             });
         } finally {
-            const loaderElement = document.querySelector('.loader');
-            const containerElement = document.querySelector('.container');
-            
-            if (loaderElement) loaderElement.classList.add('active');
-            if (containerElement) containerElement.classList.remove('active');
+            if (loader) loader.classList.add('active');
+            if (container) container.classList.remove('active');
             this.isSubmitting = false;
         }
     }
@@ -250,7 +225,7 @@ const catModal = {
 hamburgerMenu?.addEventListener('click', () => {
     sidebar?.classList.toggle('sidebar-visible');
     overlay?.classList.toggle('overlay-visible');
-    console.log("Hamburger clicked, sidebar visible:", "king",sidebar?.classList.contains('sidebar-visible'));
+    console.log("Hamburger clicked, sidebar visible:", sidebar?.classList.contains('sidebar-visible'));
 });
 
 // Close sidebar when clicking on overlay
@@ -290,7 +265,6 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', async () => {
     await fetchTableData();
-    catModal.init();
     attachEventListeners();
 });
 
@@ -343,13 +317,7 @@ function attachEventListeners() {
             const formContent = { offer: offerValue, Id: id };
 
             try {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.remove('active');
-                if (containerElement) containerElement.classList.add('active');
-                
-                const response = await fetch('/admin/subCategories/Offer', {
+                const response = await fetch('/admin/mainCategories/Offer', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formContent)
@@ -372,68 +340,63 @@ function attachEventListeners() {
                     title: 'Error',
                     text: 'Failed to submit offer. Please try again.'
                 });
-            } finally {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
             }
         });
     });
 
     // Search Functionality
     const search = document.getElementById('searchBar');
-    if (search) {
-        // Remove existing listeners by cloning and replacing
-        const newSearch = search.cloneNode(true);
-        search.parentNode.replaceChild(newSearch, search);
-        
-        newSearch.addEventListener('input', async () => {
-            const searchValue = newSearch.value;
+    search?.addEventListener('input', async () => {
+        const searchValue = search.value;
 
-            try {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.remove('active');
-                if (containerElement) containerElement.classList.add('active');
-                
-                const response = await fetch(`/admin/subCategories/search?value=${encodeURIComponent(searchValue)}`, {
-                    method: 'GET'
-                });
+        try {
+            const response = await fetch(`/admin/subCategories/search?value=${encodeURIComponent(searchValue)}`, {
+                method: 'GET'
+            });
 
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-
-                const html = await response.text();
-                const tbody = document.getElementById('tbody');
-                if (tbody) {
-                    // Remove all event listeners by replacing with cloned node
-                    const newTbody = tbody.cloneNode(false);
-                    newTbody.innerHTML = html;
-                    tbody.parentNode.replaceChild(newTbody, tbody);
-                    
-                    // Now attach event listeners
-                    attachEventListeners();
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to perform search. Please try again.'
-                });
-            } finally {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
             }
-        });
-    }
+
+            const html = await response.text();
+            const tbody = document.getElementById('tbody');
+            if (tbody) {
+                tbody.innerHTML = html;
+                attachEventListeners(); // Reattach event listeners after updating table
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to perform search. Please try again.'
+            });
+        }
+    });
+
+    // Initialize category modal
+    catModal.init();
+
+    // Add Category Modal Button Logic
+    const addCategoryBtn = document.querySelector('.add-category-btn');
+    const addForm = document.querySelector('#catModalOverlay5');
+    const form = document.querySelector('#catCreateForm');
+    const cancelBtn = document.querySelector('.cat-btn--cancel');
+    const closeBtn = document.querySelector('.cat-modal__close-btn');
+
+    addCategoryBtn?.addEventListener('click', () => {
+        addForm?.classList.remove('active');
+    });
+
+    cancelBtn?.addEventListener('click', () => {
+        addForm?.classList.add('active');
+        form?.reset();
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        addForm?.classList.add('active');
+        form?.reset();
+    });
 
     // Edit Button Logic
     document.querySelectorAll('.edit').forEach((btn) => {
@@ -487,12 +450,6 @@ function attachEventListeners() {
                     throw new Error('Category ID not found');
                 }
 
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.remove('active');
-                if (containerElement) containerElement.classList.add('active');
-
                 const response = await fetch('/admin/subcategories/inactivate', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -516,12 +473,6 @@ function attachEventListeners() {
                     title: 'Error',
                     text: 'Failed to inactivate the category. Please try again.'
                 });
-            } finally {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
             }
         });
     });
@@ -546,12 +497,6 @@ function attachEventListeners() {
                     throw new Error('Category ID not found');
                 }
 
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.remove('active');
-                if (containerElement) containerElement.classList.add('active');
-
                 const response = await fetch('/admin/subcategories/activate', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -561,26 +506,13 @@ function attachEventListeners() {
                 if (!response.ok) {
                     throw new Error(`Network error: ${response.statusText}`);
                 }
-            
-                const result1 = await response.text();
-                console.log(result1);
 
-                if(result1 === "main"){
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'First activate the main category'
-                    });
-                }
-                else if(result1 === "done"){
-                    await fetchTableData();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Category activated successfully!'
-                    });
-                }
-               
+                await fetchTableData();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Category activated successfully!'
+                });
             } catch (error) {
                 console.error('Error:', error);
                 Swal.fire({
@@ -588,12 +520,6 @@ function attachEventListeners() {
                     title: 'Error',
                     text: 'Failed to activate the category. Please try again.'
                 });
-            } finally {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
             }
         });
     });
@@ -631,12 +557,6 @@ function attachEventListeners() {
                     throw new Error('Category ID not found');
                 }
 
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.remove('active');
-                if (containerElement) containerElement.classList.add('active');
-
                 const response = await fetch('/admin/subCategories/delete', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
@@ -660,12 +580,6 @@ function attachEventListeners() {
                     title: 'Error',
                     text: 'Failed to delete the category. Please try again.'
                 });
-            } finally {
-                const loaderElement = document.querySelector('.loader');
-                const containerElement = document.querySelector('.container');
-                
-                if (loaderElement) loaderElement.classList.add('active');
-                if (containerElement) containerElement.classList.remove('active');
             }
         });
     });
@@ -676,7 +590,6 @@ function initializeEditForm(form, btn) {
     const imageInput = form.querySelector('#edtImageInput');
     const cropImage = form.querySelector('#edtCropImage');
     const editOverlay = btn.closest('td')?.querySelector('.edt-modal__overlay');
-    const previewContainer = form.querySelector('.edt-crop__preview');
     let cropper = null;
     let isSubmitting = false; // Add submission state tracking
 
@@ -725,11 +638,10 @@ function initializeEditForm(form, btn) {
 
                     if (cropper) cropper.destroy();
 
-                    const newPreviewContainer = form.querySelector('.edt-crop__preview');
                     cropper = new Cropper(newCropImage, {
                         aspectRatio: 1,
                         viewMode: 2,
-                        preview: newPreviewContainer,
+                        preview: form.querySelector('.edt-crop__preview'),
                         responsive: true,
                         autoCropArea: 0.8,
                         cropBoxResizable: true,
@@ -740,6 +652,7 @@ function initializeEditForm(form, btn) {
             reader.readAsDataURL(file);
         });
     }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -752,7 +665,7 @@ function initializeEditForm(form, btn) {
         let payload = {};
         const categoryName = form.querySelector('#Name')?.value;
         const categoryId = form.querySelector('#Id')?.value;
-    
+
         if (!categoryName) {
             Swal.fire({
                 icon: 'warning',
@@ -762,72 +675,80 @@ function initializeEditForm(form, btn) {
             isSubmitting = false;
             return;
         }
-    
+
         try {
-            const loaderElement = document.querySelector('.loader');
-            const containerElement = document.querySelector('.container');
-            
-            if (loaderElement) loaderElement.classList.remove('active');
-            if (containerElement) containerElement.classList.add('active');
-    
             if (cropper) {
-                try {
-                    const canvas = cropper.getCroppedCanvas();
-                    if (canvas) {
-                        const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        payload = {
-                            id: categoryId,
-                            name: categoryName,
-                            croppedImage: croppedDataUrl
-                        };
-                    } else {
-                        throw new Error('Failed to crop image');
-                    }
-                } catch (cropError) {
-                    console.error('Cropping error:', cropError);
-                    throw cropError; // Re-throw to be caught by the outer try/catch
+                const canvas = cropper.getCroppedCanvas();
+                if (canvas) {
+                    const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    payload = {
+                        id: categoryId,
+                        name: categoryName,
+                        croppedImage: croppedDataUrl
+                    };
                 }
+            } else {
+                payload = {
+                    id: categoryId,
+                    name: categoryName
+                };
             }
-            
-            // Add missing code to actually submit the data
-            const response = await fetch('/admin/categories/update', {
+
+            if (loader) loader.classList.remove('active');
+            if (container) container.classList.add('active');
+
+            const response = await fetch('/admin/subCategories/edit', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
             });
-            
+
             if (!response.ok) {
-                throw new Error(`Network response was not ok: ${response.statusText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const result = await response.text();
             
-            // Handle successful response
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Category updated successfully'
-            });
-            
-            // Refresh table data
-            await fetchTableData();
-            
+            if (result === 'done') {
+                await fetchTableData();
+                closeEditForm();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Category updated successfully!'
+                });
+            } else if(result === 'exists') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Category name already exists'
+                });
+                isSubmitting = false; // Reset submission state on error
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result
+                });
+                isSubmitting = false; // Reset submission state on error
+            }
         } catch (error) {
-            console.error('Submission error:', error);
+            console.error('Error updating category:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Failed to update category. Please try again.'
             });
+            isSubmitting = false; // Reset submission state on error
         } finally {
-            isSubmitting = false; // Reset submission state regardless of outcome
-            const loader = document.querySelector('.loader');
-            const container = document.querySelector('.container');
             if (loader) loader.classList.add('active');
             if (container) container.classList.remove('active');
         }
     });
 }
+
 // Function to fetch and update table data
 async function fetchTableData() {
     try {

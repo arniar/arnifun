@@ -19,6 +19,7 @@
   --scrollbar-thumb: rgba(234, 179, 8, 0.3);
   --scrollbar-thumb-hover: rgba(234, 179, 8, 0.5);
   --transition-speed: 0.3s;
+  --hover-color: #ca8a04;
 }
 
 body {
@@ -347,19 +348,14 @@ body {
   font-weight: 600;
 }
 
-/* Fixed Table Styles - Improved for mobile and fixed header overlap */
+/* Fixed Table Styles - Updated for both horizontal and vertical scrolling */
 .table-container {
   background: var(--card-dark);
   border-radius: 0.5rem;
-  overflow: hidden;
+  overflow: auto; /* Changed from 'overflow: hidden' to 'overflow: auto' */
   margin-bottom: 2rem;
   position: relative;
-}
-
-/* Create a table wrapper to handle scrolling without header issues */
-.table-container {
-  max-height: 500px; /* Set a max height to ensure scrolling */
-  overflow-y: auto;
+  max-height: 500px; /* Set a max height to ensure vertical scrolling */
 }
 
 .sales-table {
@@ -585,10 +581,7 @@ body {
   /* Adjust table for small screens */
   .table-container {
     border-radius: 0.375rem;
-  }
-  
-  .sales-table {
-    min-width: 500px;
+    overflow-x: auto; /* Ensure horizontal scroll works */
   }
 }
 
@@ -619,6 +612,18 @@ body {
   
   .format-options {
     flex-direction: column;
+  }
+  
+  /* Enhanced table responsiveness for very small screens */
+  .table-container {
+    max-width: 100%;
+    overflow-x: auto; /* Explicitly ensure horizontal scroll on very small screens */
+  }
+  
+  .sales-table th,
+  .sales-table td {
+    padding: 0.75rem;
+    white-space: nowrap; /* Prevent text wrapping in cells */
   }
 }
 

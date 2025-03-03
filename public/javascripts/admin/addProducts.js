@@ -579,9 +579,9 @@ class ProductManager {
     initFormButtons() {
         document.getElementById('submitForm').addEventListener('click', () => this.submitForm());
         document.getElementById('cancelForm').addEventListener('click', () => {
-            if(confirm('Are you sure you want to cancel? All changes will be lost.')) {
-                window.location.href = '/products';
-            }
+            
+                window.location.href = '/admin/products';
+            
         });
     }
 

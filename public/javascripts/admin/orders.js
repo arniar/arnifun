@@ -422,7 +422,7 @@ function attachInfoListeners() {
     });
 }
 
-// Attach change status listeners
+// FIXED: Attach change status listeners
 function attachChangeStatusListeners() {
     document.querySelectorAll('.change-status-btn').forEach(button => {
         button.addEventListener('click', async function(e) {
@@ -430,41 +430,130 @@ function attachChangeStatusListeners() {
             e.stopPropagation();
             const orderId = this.getAttribute('data-order-id');
             try {
+                const orderResponse = await fetch(`/admin/orders/${orderId}/details`);
+                if (!orderResponse.ok) throw new Error('Failed to fetch order details');
+                const orderData = await orderResponse.json();
+                const orderCurrentStatus = orderData.order.status;
+                
+                // Define status progression and available options based on current status
+                let availableOptions = {};
+                
+                switch(orderCurrentStatus) {
+                    case 'Pending':
+                        availableOptions = {
+                            'Pending': 'Pending',
+                            'Processing': 'Processing',
+                            'Cancelled': 'Cancelled'
+                        };
+                        break;
+                    case 'Processing':
+                        availableOptions = {
+                            'Processing': 'Processing',
+                            'Shipped': 'Shipped',
+                            'Cancelled': 'Cancelled'
+                        };
+                        break;
+                    case 'Shipped':
+                        availableOptions = {
+                            'Shipped': 'Shipped',
+                            'Delivered': 'Delivered'
+                        };
+                        break;
+                    case 'Delivered':
+                        availableOptions = {
+                            'Delivered': 'Delivered'
+                        };
+                        break;
+                    case 'Refund Requested':
+                        // For refund requested, only show refund actions, not status changes
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Refund In Progress',
+                            text: 'This order has a pending refund request. Please use the approve or reject refund buttons instead.',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return;
+                    case 'Refunded':
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Order Already Refunded',
+                            text: 'This order has been refunded and its status cannot be changed.',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return;
+                    case 'Cancelled':
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Order Already Cancelled',
+                            text: 'This order has been cancelled and its status cannot be changed.',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return;
+                    case 'Returned':
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Order Already Returned',
+                            text: 'This order has been returned and its status cannot be changed.',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                        return;
+                    default:
+                        availableOptions = {
+                            'Pending': 'Pending',
+                            'Processing': 'Processing',
+                            'Shipped': 'Shipped',
+                            'Delivered': 'Delivered',
+                            'Cancelled': 'Cancelled'
+                        };
+                }
+                
+                // If there are no options or only one option (current status), show a message
+                if (Object.keys(availableOptions).length <= 1) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Status Update Restricted',
+                        text: `Orders in '${orderCurrentStatus}' status cannot be changed to a different status.`,
+                        confirmButtonColor: '#3b82f6'
+                    });
+                    return;
+                }
+                
                 const result = await Swal.fire({
                     title: 'Change Order Status',
                     input: 'select',
-                    inputOptions: {
-                        'Pending': 'Pending',
-                        'Processing': 'Processing',
-                        'Shipped': 'Shipped',
-                        'Delivered': 'Delivered',
-                    },
+                    inputOptions: availableOptions,
                     inputPlaceholder: 'Select the new status',
+                    inputValue: orderCurrentStatus, // Pre-select current status
                     showCancelButton: true,
                     confirmButtonText: 'Update',
                     cancelButtonText: 'Cancel',
                     showLoaderOnConfirm: true,
+                    footer: '<div class="text-left text-red-500">Note: Orders can only progress forward in the workflow.</div>',
                     inputValidator: (value) => {
                         if (!value) {
                             return 'You need to select a status';
+                        }
+                        if (value === orderCurrentStatus) {
+                            return 'Please select a different status';
                         }
                     }
                 });
 
                 if (result.isConfirmed) {
+                    const newStatus = result.value;
                     const response = await fetch(`/admin/orders/${orderId}/status`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ status: result.value })
+                        body: JSON.stringify({ status: newStatus })
                     });
                     
                     const data = await response.json();
                     if (!data.success) {
                         throw new Error(data.message || 'Failed to update status');
                     }
-
+                
                     await Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -472,6 +561,8 @@ function attachChangeStatusListeners() {
                         timer: 1500,
                         showConfirmButton: false
                     });
+                    
+                    // Refresh the current view with the global filter state
                     filterOrders(currentStatus, currentPage);
                 }
             } catch (error) {
@@ -485,7 +576,7 @@ function attachChangeStatusListeners() {
     });
 }
 
-// Attach refund handling listeners
+// FIXED: Attach refund handling listeners
 function attachRefundListeners() {
     // Approve Refund
     document.querySelectorAll('.approve-refund-btn').forEach(button => {
@@ -528,6 +619,8 @@ function attachRefundListeners() {
                         timer: 1500,
                         showConfirmButton: false
                     });
+                    
+                    // Use the currentStatus from the global state for refreshing
                     filterOrders(currentStatus, currentPage);
                 }
             } catch (error) {
@@ -581,6 +674,8 @@ function attachRefundListeners() {
                         timer: 1500,
                         showConfirmButton: false
                     });
+                    
+                    // Use the currentStatus from the global state for refreshing
                     filterOrders(currentStatus, currentPage);
                 }
             } catch (error) {

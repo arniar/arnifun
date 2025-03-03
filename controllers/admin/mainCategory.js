@@ -97,7 +97,7 @@ exports.postAdminCategoryEdit = async (req, res, next) => {
         name = name.toLowerCase();
         console.log(req.body)
 
-        const exist = await mainCategory.findOne({ mainCategoryName: name });
+        const exist = await mainCategory.findOne({ mainCategoryName: name,_id:{$ne: id} });
         if (exist) {
             return res.send("exists");
         }

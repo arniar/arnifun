@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', function() {
                 const modal = this.nextElementSibling;
                 modal.classList.remove('hide');
+                // Add active class to make sure modal is displayed properly
+                modal.classList.add('active');
             });
         });
 
@@ -121,6 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userId = this.dataset.userId;
                 const reasonTextarea = document.getElementById(`blockReason-${userId}`);
                 await handleBlock(userId, reasonTextarea.value);
+                // Hide the modal after confirmation
+                const modal = this.closest('.modal-overlay');
+                modal.classList.add('hide');
+                modal.classList.remove('active');
             });
         });
 
@@ -147,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', function() {
                 const modal = this.closest('.modal-overlay');
                 modal.classList.add('hide');
+                modal.classList.remove('active');
             });
         });
     }

@@ -78,6 +78,7 @@ exports.searchSubCategories = async (req, res, next) => {
 exports.createSubCategory = async (req, res, next) => {
     try {
         let name = req.body.name;
+        name = name.toLowerCase();
         const exist = await subCategory.findOne({ subCategoryName: name, mainCategory: req.session.mainCategoryId });
         console.log(exist);
         if (exist) {

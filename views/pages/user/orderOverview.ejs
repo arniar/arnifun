@@ -150,7 +150,7 @@
                             <button class="btn btn-secondary" onclick="cancelOrder('<%= order.orderId %>')">Cancel Order</button>
                         <% } else if (order.status === 'Payment Failed') { %>
                             <button class="btn btn-warning" onclick="retryPayment('<%= order.orderId %>')">Retry Payment</button>
-                        <% } else if (order.status !== 'Cancelled' && order.status !== 'Refund Requested' && order.status !== 'Payment Failed' && order.status !== 'Returned') { %>
+                        <% } else if (order.status !== 'Cancelled' && order.status !== 'Refund Requested' && order.status !== 'Payment Failed' && order.status !== 'Returned' && order.previousStatus == 'null') { %>
                             <button class="btn btn-primary" onclick="requestRefund('<%= order.orderId %>', '<%= order.paymentMethod %>')">Request Refund</button>
                         <% } %>
                     </div>

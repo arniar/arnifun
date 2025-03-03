@@ -159,8 +159,39 @@
 </template>
 
 <template id="add-editModalTemplate">
-    <!-- (unchanged template content) -->
+    <div class="add-modal">
+        <div class="add-modal-content">
+            <div class="add-modal-header">
+                <h2>Edit Image</h2>
+                <button type="button" class="add-modal-close" id="add-modalClose">×</button>
+            </div>
+            <form id="add-uploadForm">
+                <div class="add-form-group">
+                    <label>Choose Image</label>
+                    <input type="file" id="add-imageInput" accept="image/*">
+                </div>
+                <div id="add-cropContainer">
+                    <div id="add-cropArea"></div>
+                </div>
+                <div id="add-cropPreview" class="add-crop-preview" style="display:none;">
+                    <div class="add-preview-mini-boxes">
+                        <div class="add-preview-mini">
+                            <img id="add-previewMini" src="" alt="Preview">
+                        </div>
+                    </div>
+                    <div class="add-preview-large">
+                        <img id="add-previewLarge" src="" alt="Preview">
+                    </div>
+                </div>
+                <div class="add-button-group">
+                    <button type="button" class="add-btn add-btn-secondary" id="add-cancelBtn">Cancel</button>
+                    <button type="submit" class="add-btn add-btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </template>
+
 
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>

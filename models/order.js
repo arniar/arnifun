@@ -37,8 +37,8 @@ const orderSchema = new mongoose.Schema({
     },
     previousStatus: {
         type: String,
-        default: 'Pending',
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered']
+        default: 'null',
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered','null']
     },
     reasonForRefund: {
         type: String,

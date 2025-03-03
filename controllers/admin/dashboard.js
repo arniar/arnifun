@@ -36,7 +36,7 @@ async function getDashboardStats() {
         const [totalSalesAgg, totalProducts, totalCustomers, totalOrders] = await Promise.all([
             Order.aggregate([
                 { $match: { status: 'Delivered' } },
-                { $group: { _id: null, total: { $sum: '$price' } } }
+                { $group: { _id: null, total: { $sum: { $multiply: ['$price', '$quantity'] } } } }
             ]),
             Product.countDocuments({ status: 'active' }),
             User.countDocuments({ status: 'active' }),

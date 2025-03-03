@@ -1022,3 +1022,304 @@ textarea.add-form-control {
         background: var(--border-dark);
     }
 }
+
+   /* Modal Styles - With add- prefix */
+.add-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-modal.active {
+    display: flex;
+}
+
+.add-modal-content {
+    background: var(--card-dark);
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.add-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-dark);
+    padding-bottom: 1rem;
+}
+
+.add-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.add-modal-close:hover {
+    color: var(--primary-color);
+}
+
+/* Form styles */
+.add-form-group {
+    margin-bottom: 1rem;
+}
+
+.add-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.add-form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: var(--card-dark);
+    color: var(--text-light);
+}
+
+/* Crop container styles */
+#add-cropContainer {
+    margin: 1rem 0;
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    padding: 1rem;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+#add-cropArea {
+    max-width: 100%;
+    height: 400px;
+    background: #333;
+}
+
+#add-cropPreview {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.add-preview-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#add-previewMini {
+    width: 100px;
+    height: 140px;
+    border: 2px solid var(--border-dark);
+    border-radius: 8px;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+#add-previewLarge {
+    width: 300px;
+    height: 420px;
+    border: 2px solid var(--border-dark);
+    border-radius: 8px;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+/* Button styles */
+.add-button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.add-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
+}
+
+.add-btn-primary {
+    background: var(--primary-color);
+    color: var(--text-light);
+}
+
+.add-btn-primary:hover {
+    background: #d69e00;
+}
+
+.add-btn-secondary {
+    background: var(--border-dark);
+    color: var(--text-light);
+}
+
+.add-btn-secondary:hover {
+    background: #4b5563;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    #add-previewLarge {
+        width: 240px;
+        height: 336px;
+    }
+    
+    #add-cropPreview {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .add-modal-content {
+        padding: 1rem;
+    }
+    
+    #add-previewLarge {
+        width: 200px;
+        height: 280px;
+    }
+    
+    .add-button-group {
+        justify-content: center;
+    }
+}
+
+/* Modal preview container styles */
+#add-cropPreview {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.add-preview-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Mini preview with 5:7 aspect ratio */
+#add-previewMini {
+    width: 100px;
+    height: 140px; /* 5:7 ratio - 100px × 7/5 = 140px */
+    border: 2px solid var(--border-dark);
+    border-radius: 8px;
+    overflow: hidden;
+    object-fit: cover;
+    background-color: var(--card-dark);
+}
+
+/* Large preview with 5:7 aspect ratio */
+#add-previewLarge {
+    width: 300px;
+    height: 420px; /* 5:7 ratio - 300px × 7/5 = 420px */
+    border: 2px solid var(--border-dark);
+    border-radius: 8px;
+    overflow: hidden;
+    object-fit: cover;
+    background-color: var(--card-dark);
+}
+
+/* Responsive adjustments while maintaining aspect ratio */
+@media (max-width: 768px) {
+    #add-cropPreview {
+        gap: 1.5rem;
+    }
+    
+    #add-previewLarge {
+        width: 250px;
+        height: 350px; /* 5:7 ratio maintained */
+    }
+}
+
+@media (max-width: 576px) {
+    .add-modal-content {
+        padding: 1rem;
+    }
+    
+    #add-cropPreview {
+        gap: 1rem;
+    }
+    
+    #add-previewLarge {
+        width: 200px;
+        height: 280px; /* 5:7 ratio maintained */
+    }
+    
+    #add-previewMini {
+        width: 85px;
+        height: 119px; /* 5:7 ratio maintained */
+    }
+    
+    .add-button-group {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 400px) {
+    #add-previewLarge {
+        width: 180px;
+        height: 252px; /* 5:7 ratio maintained */
+    }
+    
+    #add-previewMini {
+        width: 75px;
+        height: 105px; /* 5:7 ratio maintained */
+    }
+    
+    .add-modal-content {
+        padding: 0.75rem;
+    }
+}
+
+/* Improve crop container */
+#add-cropContainer {
+    margin: 1rem 0;
+    border: 1px solid var(--border-dark);
+    border-radius: 4px;
+    padding: 1rem;
+    overflow: hidden;
+}
+
+#add-cropArea {
+    max-width: 100%;
+    height: 400px;
+    background: var(--bg-dark);
+}
+
+/* Better styling for cropper */
+.cropper-view-box,
+.cropper-face {
+    border-radius: 4px;
+}
+
+.cropper-line, .cropper-point {
+    background-color: var(--primary-color);
+}
