@@ -257,7 +257,7 @@ exports.applyCoupon = async (req, res) => {
         // Validate minimum purchase amount
         if (subtotal < coupon.minAmount) {
             return res.status(400).json({ 
-                error: `Minimum purchase amount of $${coupon.minAmount} required` 
+                error: `Minimum purchase amount of ₹${coupon.minAmount} required` 
             });
         }
 

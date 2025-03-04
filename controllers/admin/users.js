@@ -14,7 +14,7 @@ exports.getUsersTable = async (req, res) => {
         const searchQuery = req.query.search || ''; // Get the search query
 
         // Build the query to fetch users
-        let query = { role: "User " };
+        let query = { role: "User" };
         
         // Add status condition if not "All"
         if (req.session.condition !== "All") {

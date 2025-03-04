@@ -698,7 +698,7 @@ function initializeEditForm(form, btn) {
             if (container) container.classList.add('active');
 
             const response = await fetch('/admin/subCategories/edit', {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },

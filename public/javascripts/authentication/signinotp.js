@@ -43,6 +43,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Toast Alert Function
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        `;
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background-color: ${
+            type === 'success' ? '#4CAF50' : 
+            type === 'error' ? '#F44336' : 
+            '#2196F3'
+        };
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease-in-out;
+    `;
+    toast.textContent = message;
+
+    // Append toast to container
+    toastContainer.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    });
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            toastContainer.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
 // Timer for Resend OTP
 let countdown = 60; // Timer duration in seconds
 const resendBtn = document.getElementById('resendBtn'); // Resend button
@@ -106,18 +163,18 @@ resendBtn.addEventListener('click', () => {
 
     // Check if the resend limit has been reached
     if (count >= 5) {
-        alert('You have reached the maximum resend attempts. Try again after 12 hours.');
+        showToast('You have reached the maximum resend attempts. Try again after 12 hours.', 'error');
         return;
     }
 
-    alert('OTP has been resent!'); // Notify user that OTP has been resent
+    showToast('OTP has been resent!', 'success'); // Notify user that OTP has been resent
     count++;
     localStorage.setItem('count', count); // Increment the resend count
 
     // If the count reaches 5, set expiry time
     if (count === 5) {
         setExpiryTime();
-        alert('You have reached the maximum attempts. Please wait 12 hours.');
+        showToast('You have reached the maximum attempts. Please wait 12 hours.', 'error');
     }
 
     countdown = 60; // Reset countdown
@@ -152,12 +209,15 @@ function resend() {
     })
     .then(response => {
         if (response.ok) {
-            console.log('POST request sent successfully'); // Log success
+            showToast('OTP resent successfully', 'success');
         } else {
-            console.error('Failed to send POST request'); // Log failure
+            showToast('Failed to resend OTP', 'error');
         }
     })
-    .catch(error => console.error('Error:', error)); // Log any errors
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred while resending OTP', 'error');
+    });
 }
 
 // Background canvas animation
