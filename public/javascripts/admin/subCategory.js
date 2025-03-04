@@ -317,7 +317,7 @@ function attachEventListeners() {
             const formContent = { offer: offerValue, Id: id };
 
             try {
-                const response = await fetch('/admin/mainCategories/Offer', {
+                const response = await fetch('/admin/subCategories/Offer', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formContent)
