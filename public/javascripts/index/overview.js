@@ -501,7 +501,7 @@ document.querySelector('.add-to-cart').addEventListener('click', async () => {
 
     } catch (error) {
         console.error('Error adding to cart:', error);
-        showToast(error.message || 'Failed to add item to cart. Please try again.', 'error');
+        showToast( 'Failed to add item to cart. Please login or logout and login again.','error');
     }
 });
 
@@ -567,7 +567,7 @@ wishlistBtn.addEventListener('click', async () => {
 
     } catch (error) {
         console.error('Error updating wishlist:', error);
-        showToast('Failed to update wishlist. Please try again.', 'error');
+        showToast('Failed to update wishlist.  Please login or logout and login again.', 'error');
     }
 });
 

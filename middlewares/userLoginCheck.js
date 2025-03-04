@@ -1,6 +1,6 @@
 // Authentication Middleware
 function isAuthenticated(req, res, next) {
-    if (!req.user || !req.session || !req.session.isAuthenticated) {
+    if (req.session.isAuthenticated!== true) {
         return res.redirect('/auth/login');
     }
     next();
