@@ -681,3 +681,31 @@ class addProductManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.productManager = new addProductManager();
 });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        // Toggle sidebar
+        hamburgerMenu.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside or on a link
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Close sidebar when clicking on a navigation link
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        });
+    });

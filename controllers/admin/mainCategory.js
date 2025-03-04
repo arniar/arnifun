@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const cloudinary = require('../../config/cloudinary');
 const Product = require('../../models/product');
-const mainCategory = require('../../models/mainCategory');
-const subCategories = require('../../models/subCategory');
+const MainCategory = require('../../models/mainCategory');
+const SubCategory = require('../../models/subCategory');
 
 const ObjectId = mongoose.Types.ObjectId;
 
+// Render the admin main category page
 exports.getAdminCategory = async (req, res, next) => {
     try {
         res.render('../views/pages/admin/mainCategory');
@@ -15,10 +16,11 @@ exports.getAdminCategory = async (req, res, next) => {
     }
 };
 
+// Fetch and render the admin category table
 exports.postAdminCategoryTable = async (req, res, next) => {
     try {
-        let mainCategories = await mainCategory.find();
-        let subcategoriesCount = await subCategories.aggregate([{ $group: { _id: "$mainCategory", count: { $sum: 1 } } }]).exec();
+        let mainCategories = await MainCategory.find();
+        let subcategoriesCount = await SubCategory.aggregate([{ $group: { _id: "$mainCategory", count: { $sum: 1 } } }]).exec();
         res.render('../views/partials/admin/mainCategoryTable', { mainCategories, subcategoriesCount });
     } catch (error) {
         console.error('Error fetching admin category table:', error);
@@ -26,16 +28,17 @@ exports.postAdminCategoryTable = async (req, res, next) => {
     }
 };
 
+// Update the offer percentage for a main category and its subcategories
 exports.patchMainCategoryOffer = async (req, res, next) => {
     try {
         let offer = req.body.offer;
         let Id = req.body.Id;
 
-        await mainCategory.updateOne({ _id: Id }, { $set: { offerPercentage: offer } });
-        let subcategory = await subCategories.find({ mainCategory: Id });
-        await subCategories.updateMany({ mainCategory: Id }, { $set: { offerPercentage: 0 } });
+        await MainCategory.updateOne({ _id: Id }, { $set: { offerPercentage: offer } });
+        let subcategories = await SubCategory.find({ mainCategory: Id });
+        await SubCategory.updateMany({ mainCategory: Id }, { $set: { offerPercentage: 0 } });
 
-        for (const category of subcategory) {
+        for (const category of subcategories) {
             let products = await Product.find({ subCategory: category._id });
             for (const product of products) {
                 await Product.updateOne(
@@ -55,10 +58,11 @@ exports.patchMainCategoryOffer = async (req, res, next) => {
     }
 };
 
+// Search for main categories based on a query
 exports.getAdminCategorySearch = async (req, res, next) => {
     try {
-        let mainCategories = await mainCategory.find({ mainCategoryName: { $regex: `${req.query.value}`, $options: 'i' } });
-        let subcategoriesCount = await subCategories.aggregate([{ $group: { _id: "$mainCategory", count: { $sum: 1 } } }]).exec();
+        let mainCategories = await MainCategory.find({ mainCategoryName: { $regex: `${req.query.value}`, $options: 'i' } });
+        let subcategoriesCount = await SubCategory.aggregate([{ $group: { _id: "$mainCategory", count: { $sum: 1 } } }]).exec();
         res.render('adminCategory/table', { mainCategories, subcategoriesCount });
     } catch (error) {
         console.error('Error searching admin categories:', error);
@@ -66,9 +70,10 @@ exports.getAdminCategorySearch = async (req, res, next) => {
     }
 };
 
+// Create a new main category
 exports.postAdminCategoryCreate = async (req, res, next) => {
     try {
-        const exist = await mainCategory.findOne({ mainCategoryName: req.body.name });
+        const exist = await MainCategory.findOne({ mainCategoryName: req.body.name });
         if (exist) {
             return res.send("exists");
         }
@@ -83,7 +88,7 @@ exports.postAdminCategoryCreate = async (req, res, next) => {
         const result = await cloudinary.uploader.upload(croppedImage, {
             folder: 'adminCategory'
         });
-        await mainCategory.create({ mainCategoryName: name, image: result.secure_url });
+        await MainCategory.create({ mainCategoryName: name, image: result.secure_url });
         return res.send('done');
     } catch (error) {
         console.error('Error creating admin category:', error);
@@ -91,13 +96,13 @@ exports.postAdminCategoryCreate = async (req, res, next) => {
     }
 };
 
+// Edit an existing main category
 exports.postAdminCategoryEdit = async (req, res, next) => {
     try {
         let { croppedImage, name, id } = req.body;
         name = name.toLowerCase();
-        console.log(req.body)
 
-        const exist = await mainCategory.findOne({ mainCategoryName: name,_id:{$ne: id} });
+        const exist = await MainCategory.findOne({ mainCategoryName: name, _id: { $ne: id } });
         if (exist) {
             return res.send("exists");
         }
@@ -107,7 +112,7 @@ exports.postAdminCategoryEdit = async (req, res, next) => {
         }
 
         if (!croppedImage) {
-            await mainCategory.updateOne({ _id: id }, { mainCategoryName: name });
+            await MainCategory.updateOne({ _id: id }, { mainCategoryName: name });
             return res.send("done");
         }
 
@@ -115,7 +120,7 @@ exports.postAdminCategoryEdit = async (req, res, next) => {
             folder: 'adminCategory'
         });
 
-        await mainCategory.updateOne(
+        await MainCategory.updateOne(
             { _id: id },
             { mainCategoryName: name, image: result.secure_url }
         );
@@ -127,13 +132,14 @@ exports.postAdminCategoryEdit = async (req, res, next) => {
     }
 };
 
+// Inactivate a main category and its subcategories
 exports.patchInactivate = async (req, res, next) => {
     try {
         const id = req.body.id;
-        await mainCategory.updateOne({ _id: id }, { status: "inactive" });
-        await subCategories.updateMany({ mainCategory: id }, { status: "inactive" });
-        let subcategory = await subCategories.find({ mainCategory: id });
-        for (const category of subcategory) {
+        await MainCategory.updateOne({ _id: id }, { status: "inactive" });
+        await SubCategory.updateMany({ mainCategory: id }, { status: "inactive" });
+        let subcategories = await SubCategory.find({ mainCategory: id });
+        for (const category of subcategories) {
             await Product.updateMany({ subCategory: category._id }, { $set: { "status": "inactive" } });
         }
         res.send("ok");
@@ -143,13 +149,14 @@ exports.patchInactivate = async (req, res, next) => {
     }
 };
 
+// Activate a main category and its subcategories
 exports.patchActivate = async (req, res, next) => {
     try {
         const id = req.body.id;
-        await mainCategory.updateOne({ _id: id }, { status: "active" });
-        await subCategories.updateMany({ mainCategory: id }, { status: "active" });
-        let subcategory = await subCategories.find({ mainCategory: id });
-        for (const category of subcategory) {
+        await MainCategory.updateOne({ _id: id }, { status: "active" });
+        await SubCategory.updateMany({ mainCategory: id }, { status: "active" });
+        let subcategories = await SubCategory.find({ mainCategory: id });
+        for (const category of subcategories) {
             await Product.updateMany({ subCategory: category._id }, { $set: { "status": "active" } });
         }
         res.send("ok");
@@ -159,13 +166,14 @@ exports.patchActivate = async (req, res, next) => {
     }
 };
 
+// Delete a main category and its subcategories
 exports.deleteCategory = async (req, res, next) => {
     try {
         const id = req.body.id;
-        await mainCategory.deleteOne({ _id: id });
-        await subCategories.deleteMany({ mainCategory: id });
-        let subcategory = await subCategories.find({ mainCategory: id });
-        for (const category of subcategory) {
+        await MainCategory.deleteOne({ _id: id });
+        await SubCategory.deleteMany({ mainCategory: id });
+        let subcategories = await SubCategory.find({ mainCategory: id });
+        for (const category of subcategories) {
             await Product.deleteMany({ subCategory: category._id });
         }
         res.send("ok");

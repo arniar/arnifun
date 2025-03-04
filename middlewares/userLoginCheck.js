@@ -1,6 +1,6 @@
-// // Authentication Middleware
+// Authentication Middleware
 function isAuthenticated(req, res, next) {
-    if (!req.user || typeof req.user !== 'object' || !req.session.isAuthenticated) {
+    if (!req.user || !req.session || !req.session.isAuthenticated) {
         return res.redirect('/auth/login');
     }
     next();

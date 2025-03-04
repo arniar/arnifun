@@ -1,16 +1,14 @@
-// controllers/cartController.js
 const Variant = require('../../models/variant');
 const Cart = require('../../models/cart');
 const Product = require('../../models/product');
 const Coupon = require('../../models/coupon');
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
 const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 const User = require('../../models/user');
 const Order = require('../../models/order');
 
-
+// Add item to cart
 exports.addToCart = async (req, res) => {
     try {
         const { variantId, selectedSize, quantity } = req.body;
@@ -23,7 +21,7 @@ exports.addToCart = async (req, res) => {
             });
         }
 
-        // Find cart or create new one if it doesn't exist
+        // Find cart or create a new one if it doesn't exist
         let cart = await Cart.findOne({ user: req.session.userId });
         
         if (!cart) {
@@ -65,11 +63,11 @@ exports.addToCart = async (req, res) => {
     }
 };
 
+// Get cart items
 exports.getCart = async (req, res) => {
     try {
         const userId = req.session.userId;
         const cart = await Cart.findOne({ user: userId });
-        console.log(userId);
         
         // Find the user to check their order history for used coupons
         const user = await User.findById(userId);
@@ -93,8 +91,6 @@ exports.getCart = async (req, res) => {
             !usedCouponCodes.includes(coupon.couponCode)
         );
 
-        console.log("hello")
-        
         const categoriesWithSubs = await MainCategory.aggregate([
             {
                 $match: { status: 'active' }
@@ -105,7 +101,7 @@ exports.getCart = async (req, res) => {
                     localField: '_id',
                     foreignField: 'mainCategory',
                     pipeline: [{ $match: { status: 'active' } }],
-                    as: 'subcategories',
+                    as: 'subcategories'
                 }
             }
         ]);
@@ -123,8 +119,6 @@ exports.getCart = async (req, res) => {
             const variant = await Variant.findById(item.variantId);
             const product = await Product.findById(variant.productId);
 
-            console.log(product);
-            
             const inStock = variant.sizes[item.size] >= item.quantity;
             const availableStock = variant.sizes[item.size] || 0;
             
@@ -165,7 +159,7 @@ exports.getCart = async (req, res) => {
     }
 };
 
-
+// Update item quantity in cart
 exports.updateQuantity = async (req, res) => {
     try {
         const { variantId, quantity, size2 } = req.body;
@@ -188,7 +182,7 @@ exports.updateQuantity = async (req, res) => {
         );
 
         if (itemIndex > -1) {
-            cart.items[itemIndex].quantity = quantity;
+            cart.items[itemIndex].quantity = quantity; // Update quantity
             await cart.save();
             res.json({ success: true });
         } else {
@@ -200,6 +194,7 @@ exports.updateQuantity = async (req, res) => {
     }
 };
 
+// Remove item from cart
 exports.removeItem = async (req, res) => {
     try {
         const { variantId } = req.body;
@@ -209,7 +204,7 @@ exports.removeItem = async (req, res) => {
         }
 
         cart.items = cart.items.filter(item => 
-            item.variantId.toString() !== variantId
+            item.variantId.toString() !== variantId // Remove item from cart
         );
         
         await cart.save();
@@ -219,6 +214,7 @@ exports.removeItem = async (req, res) => {
     }
 };
 
+// Apply coupon to cart
 exports.applyCoupon = async (req, res) => {
     try {
         const { code } = req.body;
@@ -281,6 +277,7 @@ exports.applyCoupon = async (req, res) => {
     }
 };
 
+// Clear coupon from cart
 exports.clearCoupon = async (req, res) => {
     try {
         const cart = await Cart.findOne({ user: req.session.userId });
@@ -320,6 +317,7 @@ exports.clearCoupon = async (req, res) => {
     }
 };
 
+// Calculate total price of items in cart
 function calculateTotal(items) {
     return items.reduce((total, item) => 
         total + (item.discountPrice || item.price) * item.quantity, 0

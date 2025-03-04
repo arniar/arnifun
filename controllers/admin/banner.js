@@ -1,4 +1,3 @@
-// bannerController.js
 const Banner = require('../../models/banner');
 const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
@@ -14,7 +13,7 @@ const bannerController = {
                 .populate({
                     path: 'categoryId',
                     refPath: 'categoryType'
-                })
+                });
             
             res.json(banners);
         } catch (error) {
@@ -34,8 +33,7 @@ const bannerController = {
                 .populate({
                     path: 'categoryId',
                     refPath: 'categoryType'
-                })
-               
+                });
 
             const mainCategories = await MainCategory.find({ status: 'active' });
             const subCategories = await SubCategory.find({ status: 'active' })
@@ -56,89 +54,80 @@ const bannerController = {
     },
 
     // Create new banner
-    createBanner:   async (req, res) => {try {
-        const { 
-            title, 
-            heading, 
-            subtext, 
-            buttonText, 
-            categoryType,
-            categoryId,
-            image 
-        } = req.body;
+    createBanner: async (req, res) => {
+        try {
+            const { 
+                title, 
+                heading, 
+                subtext, 
+                buttonText, 
+                categoryType,
+                categoryId,
+                image 
+            } = req.body;
 
-        console.log( categoryType,
-            categoryId)
+            // Validate required fields
+            if (!title || !heading || !subtext || !buttonText || !categoryType || !categoryId) {
+                return res.status(400).json({ 
+                    error: 'Missing required fields' 
+                });
+            }
 
+            // Validate category exists
+            let category;
+            if (categoryType === 'MainCategory') {
+                category = await MainCategory.findById(categoryId);
+            } else {
+                category = await SubCategory.findById(categoryId);
+            }
 
-        // Validate required fields
-        if (!title || !heading || !subtext || !buttonText || !categoryType || !categoryId) {
-            return res.status(400).json({ 
-                error: 'Missing required fields' 
+            if (!category) {
+                return res.status(400).json({
+                    error: 'Selected category not found'
+                });
+            }
+
+            // Upload image to Cloudinary
+            const uploadResult = await cloudinary.uploader.upload(image, {
+                folder: 'banners',
+                resource_type: 'image',
+                quality: 'auto'
+            });
+
+            // Get the highest order number
+            const lastBanner = await Banner.findOne().sort({ order: -1 });
+            const newOrder = lastBanner ? lastBanner.order + 1 : 0;
+
+            // Create new banner
+            const banner = new Banner({
+                title,
+                heading,
+                subtext,
+                buttonText,
+                imageUrl: uploadResult.secure_url,
+                categoryType,
+                categoryId,
+                order: newOrder,
+                isActive: true
+            });
+
+            await banner.save();
+
+            // Populate category information before sending response
+            await banner.populate({
+                path: 'categoryId',
+                refPath: 'categoryType'
+            });
+
+            res.status(201).json(banner);
+        } catch (error) {
+            console.error('Error creating banner:', error);
+            res.status(500).json({ 
+                error: 'Failed to create banner',
+                details: error.message 
             });
         }
-       
-        console.log( categoryType)
-       
-
-        // Validate category exists
-        let category;
-        if (categoryType === 'MainCategory') {
-            category = await MainCategory.find({_id:categoryId});
-            console.log(category)
-        } else {
-            category = await SubCategory.find({_id:categoryId});
-        }
-
-        if (!category) {
-            console.log("done")
-            return res.status(400).json({
-                error: 'Selected category not found'
-            });
-        }
-        
-
-        // Upload image to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(image, {
-            folder: 'banners',
-            resource_type: 'image',
-            quality: 'auto'
-        });
-
-        // Get the highest order number
-        const lastBanner = await Banner.findOne().sort({ order: -1 });
-        const newOrder = lastBanner ? lastBanner.order + 1 : 0;
-
-        // Create new banner with proper model name
-        const banner = new Banner({
-            title,
-            heading,
-            subtext,
-            buttonText,
-            imageUrl: uploadResult.secure_url,
-            categoryType: categoryType, // Use the converted model name
-            categoryId,
-            order: newOrder,
-            isActive: true
-        });
-
-        await banner.save();
-
-        // Populate category information before sending response
-        await banner.populate({
-            path: 'categoryId',
-            refPath: 'categoryType'
-        });
-
-        res.status(201).json(banner);
-    } catch (error) {
-        console.error('Error creating banner:', error);
-        res.status(500).json({ 
-            error: 'Failed to create banner',
-            details: error.message 
-        });
-    }
-},
+    },
 
     // Update existing banner
     updateBanner: async (req, res) => {
@@ -153,30 +142,28 @@ const bannerController = {
                 categoryId,
                 image 
             } = req.body;
-    
+
             // Validate required fields
             if (!title || !heading || !subtext || !buttonText || !categoryType || !categoryId) {
                 return res.status(400).json({ 
                     error: 'Missing required fields' 
                 });
             }
-    
+
             // Validate banner ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ 
                     error: 'Invalid banner ID' 
                 });
             }
-    
+
             const banner = await Banner.findById(id);
             if (!banner) {
                 return res.status(404).json({ 
                     error: 'Banner not found' 
                 });
             }
-    
-            
-    
+
             // Validate category exists
             let category;
             if (categoryType === 'MainCategory') {
@@ -184,13 +171,13 @@ const bannerController = {
             } else {
                 category = await SubCategory.findById(categoryId);
             }
-    
+
             if (!category) {
                 return res.status(400).json({
                     error: 'Selected category not found'
                 });
             }
-    
+
             let imageUrl = banner.imageUrl;
             // Handle image update if provided
             if (image) {
@@ -199,17 +186,17 @@ const bannerController = {
                     const publicId = banner.imageUrl.split('/').pop().split('.')[0];
                     await cloudinary.uploader.destroy(`banners/${publicId}`);
                 }
-    
+
                 // Upload new image
                 const uploadResult = await cloudinary.uploader.upload(image, {
                     folder: 'banners',
                     resource_type: 'image',
                     quality: 'auto'
                 });
-    
+
                 imageUrl = uploadResult.secure_url;
             }
-    
+
             // Update banner with all fields
             const updatedBanner = await Banner.findByIdAndUpdate(
                 id,
@@ -219,7 +206,7 @@ const bannerController = {
                     subtext,
                     buttonText,
                     imageUrl,
-                    categoryType: categoryType,
+                    categoryType,
                     categoryId,
                     isActive: banner.isActive // Preserve the existing isActive state
                 },
@@ -231,7 +218,7 @@ const bannerController = {
                 path: 'categoryId',
                 refPath: 'categoryType'
             });
-    
+
             res.json(updatedBanner);
         } catch (error) {
             console.error('Error updating banner:', error);

@@ -10,7 +10,6 @@ const productController = {
     getHomePage: async (req, res, next) => {
         try {
             req.session.productId = req.query.id;
-            
             const page = 1;
             const limit = 10;
             const query = req.session.productId ? { subCategory: req.session.productId } : {};
@@ -21,7 +20,7 @@ const productController = {
                 Product.countDocuments(query),
                 Product.find(query).limit(limit)
             ]);
-    
+
             const totalPages = Math.ceil(totalProducts / limit);
             
             // Add pagination array logic
@@ -33,11 +32,11 @@ const productController = {
             if (endPage - startPage + 1 < maxVisiblePages) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-    
+
             for (let i = startPage; i <= endPage; i++) {
                 pages.push(i);
             }
-    
+
             res.render('../views/pages/admin/products', {
                 products,
                 mainCategories,
@@ -47,16 +46,15 @@ const productController = {
                 hasNextPage: page < totalPages,
                 hasPrevPage: page > 1,
                 totalProducts,
-                pages  // Add this line
+                pages
             });
         } catch (error) {
             next(error);
         }
     },
 
-    // GET products table with search
-     // GET products table with search and variant images
-     getProductsTable: async (req, res, next) => {
+    // GET products table with search and variant images
+    getProductsTable: async (req, res, next) => {
         try {
             const page = Math.max(1, parseInt(req.query.page) || 1);
             const limit = 10;
@@ -100,8 +98,6 @@ const productController = {
                     displayImage: variant?.images?.[0] || product.image || '/api/placeholder/48/48'
                 };
             }));
-
-            console.log(products)
 
             // Calculate pagination
             const totalPages = Math.ceil(totalProducts / limit);
@@ -180,7 +176,7 @@ const productController = {
                     tags: variant.tags
                 });
             }
-            console.log("hi")
+
             res.json({ success: true, message: 'Product added successfully' });
         } catch (error) {
             next(error);
@@ -190,8 +186,7 @@ const productController = {
     // POST edit product
     editProduct: async (req, res, next) => {
         try {
-
-            const { id, name, description, price} = req.body;
+            const { id, name, description, price } = req.body;
 
             const updatedProduct = await Product.findByIdAndUpdate(
                 id,

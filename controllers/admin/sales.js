@@ -5,6 +5,7 @@ const { Parser } = require('json2csv');
 const PDFDocument = require('pdfkit');
 
 const salesController = {
+    // Render the sales report page
     renderSalesReport: async (req, res) => {
         try {
             // Get default date range (current month)
@@ -12,13 +13,12 @@ const salesController = {
             const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
             const endDate = today;
 
-            // Get initial data
+            // Get initial sales data
             const salesData = await salesController.getProductSales({
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString()
             });
 
-            
             res.render('../views/pages/admin/sales', {
                 title: 'Sales Report',
                 path: '/sales-report',
@@ -36,9 +36,9 @@ const salesController = {
         }
     },
 
+    // Get product sales data within a date range
     getProductSales: async ({ startDate, endDate }) => {
         try {
-            
             const dateFilter = {
                 orderDate: {
                     $gte: new Date(startDate),
@@ -86,7 +86,7 @@ const salesController = {
                 return {
                     productId: product.productId,
                     name: product.name,
-                    image:productVariants.length > 0 ? productVariants[0].images[0] : null,
+                    image: productVariants.length > 0 ? productVariants[0].images[0] : null,
                     totalQuantity: productSales.reduce((sum, sale) => sum + sale.quantity, 0),
                     totalAmount: productSales.reduce((sum, sale) => sum + sale.totalAmount, 0),
                     variants: productVariants.map(variant => {
@@ -120,6 +120,7 @@ const salesController = {
         }
     },
 
+    // Download the sales report in specified format
     downloadReport: async (req, res) => {
         try {
             const { startDate, endDate, format } = req.query;
@@ -138,6 +139,7 @@ const salesController = {
         }
     },
 
+    // Download sales data as CSV
     downloadCSV: async (res, salesData, startDate, endDate) => {
         const flattenedData = salesController.flattenSalesData(salesData, startDate, endDate);
         const parser = new Parser();
@@ -148,6 +150,7 @@ const salesController = {
         res.send(csv);
     },
 
+    // Download sales data as PDF
     downloadPDF: async (res, salesData, startDate, endDate) => {
         const doc = new PDFDocument();
         res.setHeader('Content-Type', 'application/pdf');
@@ -220,6 +223,7 @@ const salesController = {
         doc.end();
     },
 
+    // Flatten sales data for CSV export
     flattenSalesData: (salesData, startDate, endDate) => {
         return salesData.products.reduce((acc, product) => {
             acc.push({
@@ -246,4 +250,5 @@ const salesController = {
         }, []);
     }
 };
+
 module.exports = salesController;

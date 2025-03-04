@@ -32,7 +32,7 @@ const addressSchema = new mongoose.Schema({
   },
   isPrimary: {
     type: Boolean,
-    default: false, // Set default to false, indicating that this address is not the primary address
+    default: false,
   },
   createdAt: {
     type: Date,

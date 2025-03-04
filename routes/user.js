@@ -10,29 +10,22 @@ const wishlist = require('./user/wishlist');
 const wallet = require('./user/wallet');
 const orderOverview = require('./user/orderOverview');
 
+const isAuthenticated = require('../middlewares/userLoginCheck');
 
-// const isAuthenticated = require('../middlewares/userLoginCheck');
-
-
-
-// // Apply authentication middleware
-// router.use(isAuthenticated);
-
-
-router.use('/pI', PIRouter);
-router.use('/adr', ADRRouter);
-router.use('/cart', cartRouter);
-router.use('/checkout', checkoutRouter);
-router.use('/order', orderRouter);
-router.use('/wishlist', wishlist);
-router.use('/wallet', wallet);
-router.use('/orderOverview', orderOverview);
+// Apply authentication middleware individually
+router.use('/pI', isAuthenticated, PIRouter);
+router.use('/adr', isAuthenticated, ADRRouter);
+router.use('/cart', isAuthenticated, cartRouter);
+router.use('/checkout', isAuthenticated, checkoutRouter);
+router.use('/order', isAuthenticated, orderRouter);
+router.use('/wishlist', isAuthenticated, wishlist);
+router.use('/wallet', isAuthenticated, wallet);
+router.use('/orderOverview', isAuthenticated, orderOverview);
 
 router.post('/logout', async (req, res) => {
     try {
         // Only clear admin-specific session data
         req.session.isAuthenticated = false;  // Clear admin authentication
-        
         res.redirect('/auth/login');
     } catch (error) {
         console.error('Logout error:', error);

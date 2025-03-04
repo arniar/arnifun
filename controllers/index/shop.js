@@ -4,11 +4,13 @@ const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 const mongoose = require('mongoose');
 
+// GET shop page
 exports.getShopPage = async (req, res, next) => {
     try {
-        const authentication = req.session.isAuthenticated;
-         // Get all categories with subcategories for hover menu
-         const categoriesWithSubs = await MainCategory.aggregate([
+        const authentication = req.session.isAuthenticated; // Check authentication status
+
+        // Get all categories with subcategories for hover menu
+        const categoriesWithSubs = await MainCategory.aggregate([
             {
                 $match: { status: 'active' }
             },
@@ -22,13 +24,16 @@ exports.getShopPage = async (req, res, next) => {
                 }
             }
         ]);
-        res.render('../views/pages/index/shop', { authentication ,categoriesWithSubs});
+
+        // Render the shop page with the fetched data
+        res.render('../views/pages/index/shop', { authentication, categoriesWithSubs });
     } catch (err) {
         console.error("Error rendering shop page:", err);
-        res.status(500).send("Error loading the shop page.");
+        res.status(500).send("Error loading the shop page."); // Handle server error
     }
 };
 
+// GET products based on filters
 exports.getProducts = async (req, res, next) => {
     try {
         const {
@@ -38,8 +43,8 @@ exports.getProducts = async (req, res, next) => {
             maxPrice,
             sizes = []
         } = req.query;
-        
-        const categoriesArray = Array.isArray(categories) ? categories : [categories].filter(Boolean);
+
+        const categoriesArray = Array.isArray(categories) ? categories : [categories].filter(Boolean); // Ensure categories is an array
 
         let aggregationPipeline = [
             {
@@ -62,12 +67,12 @@ exports.getProducts = async (req, res, next) => {
             { $unwind: "$subcategoryDetails" },
             {
                 $match: {
-                    "productDetails.status": "active"
+                    "productDetails.status": "active" // Filter for active products
                 }
             }
         ];
 
-        // Add filters
+        // Add category filter
         if (categoriesArray.length > 0) {
             const categoryIds = categoriesArray.map(cat => new mongoose.Types.ObjectId(cat));
             aggregationPipeline.push({
@@ -77,6 +82,7 @@ exports.getProducts = async (req, res, next) => {
             });
         }
 
+        // Add price filters
         if (minPrice || maxPrice) {
             const priceMatch = {};
             if (minPrice) priceMatch.$gte = parseFloat(minPrice);
@@ -89,6 +95,7 @@ exports.getProducts = async (req, res, next) => {
             });
         }
 
+        // Add size filters
         if (sizes.length > 0) {
             const sizeConditions = sizes.map(size => ({
                 [`sizes.${size}`]: { $gt: 0 }
@@ -142,6 +149,7 @@ exports.getProducts = async (req, res, next) => {
                 sortStage = { popularityScore: -1 };
         }
 
+        // Add sort stage
         aggregationPipeline.push({ $sort: sortStage });
 
         // Final projection
@@ -158,11 +166,11 @@ exports.getProducts = async (req, res, next) => {
             }
         });
 
-        const products = await Variant.aggregate(aggregationPipeline);
-        res.json(products);
+        const products = await Variant.aggregate(aggregationPipeline); // Execute the aggregation pipeline
+        res.json(products); // Return the products as JSON
 
     } catch (err) {
         console.error("Error fetching products:", err);
-        res.status(500).json({ error: "Error fetching products.", details: err.message });
+        res.status(500).json({ error: "Error fetching products.", details: err.message }); // Handle server error
     }
 };

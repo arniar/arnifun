@@ -1,20 +1,20 @@
 const User = require('../../models/user');
-const BlockUser = require('../../models/blockUser');
+const BlockUser  = require('../../models/blockUser');
 
 exports.getUsersPage = (req, res) => {
-    req.session.condition = req.query.condition || "All";
-    res.render('../views/pages/admin/users');
+    req.session.condition = req.query.condition || "All"; // Set the condition for user status
+    res.render('../views/pages/admin/users'); // Render the users page
 };
 
 exports.getUsersTable = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-        const skip = (page - 1) * limit;
-        const searchQuery = req.query.search || '';
+        const page = parseInt(req.query.page) || 1; // Get the current page number
+        const limit = 10; // Set the number of users per page
+        const skip = (page - 1) * limit; // Calculate the number of users to skip
+        const searchQuery = req.query.search || ''; // Get the search query
 
-        // Build the query
-        let query = { role: "User" };
+        // Build the query to fetch users
+        let query = { role: "User " };
         
         // Add status condition if not "All"
         if (req.session.condition !== "All") {
@@ -42,7 +42,7 @@ exports.getUsersTable = async (req, res) => {
             users,
             total,
             currentPage: page,
-            totalPages: Math.ceil(total / limit)
+            totalPages: Math.ceil(total / limit) // Calculate total pages
         });
     } catch (error) {
         console.error('Error fetching users:', error);
@@ -50,32 +50,32 @@ exports.getUsersTable = async (req, res) => {
     }
 };
 
-exports.blockUser = async (req, res) => {
+exports.blockUser  = async (req, res) => {
     try {
-        const { id, blockReason } = req.body;
+        const { id, blockReason } = req.body; // Get user ID and block reason
         
         await Promise.all([
-            BlockUser.create({ user: id, blockReason }),
-            User.findByIdAndUpdate(id, { status: "Suspended" })
+            BlockUser .create({ user: id, blockReason }), // Create a block entry
+            User.findByIdAndUpdate(id, { status: "Suspended" }) // Update user status to Suspended
         ]);
 
-        res.json({ success: true, message: 'User blocked successfully' });
+        res.json({ success: true, message: 'User  blocked successfully' });
     } catch (error) {
         console.error('Error blocking user:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-exports.unblockUser = async (req, res) => {
+exports.unblockUser  = async (req, res) => {
     try {
-        const { id } = req.body;
+        const { id } = req.body; // Get user ID
         
         await Promise.all([
-            BlockUser.deleteOne({ user: id }),
-            User.findByIdAndUpdate(id, { status: "Inactive" })
+            BlockUser .deleteOne({ user: id }), // Remove block entry
+            User.findByIdAndUpdate(id, { status: "Inactive" }) // Update user status to Inactive
         ]);
 
-        res.json({ success: true, message: 'User unblocked successfully' });
+        res.json({ success: true, message: 'User  unblocked successfully' });
     } catch (error) {
         console.error('Error unblocking user:', error);
         res.status(500).json({ error: 'Internal server error' });

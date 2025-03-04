@@ -1,13 +1,13 @@
-// routes/user/payment.js
 const express = require('express');
 const router = express.Router();
 const orderController = require('../../controllers/user/orderOverview');
+const isAuthenticated = require('../../middlewares/userLoginCheck');
 
-router.get('/:orderId', orderController.getOrderDetails);
-router.get('/:orderId/invoice', orderController.generateInvoice);
-router.post('/:orderId/retry-payment',  orderController.retryPayment);
-router.post('/verify-retry-payment', orderController.verifyRetryPayment);
-router.post('/:orderId/refund', orderController.createRefundRequest);
-router.post('/:orderId/cancel', orderController.cancelOrder);
+router.get('/:orderId', isAuthenticated, orderController.getOrderDetails);
+router.get('/:orderId/invoice', isAuthenticated, orderController.generateInvoice);
+router.post('/:orderId/retry-payment', isAuthenticated, orderController.retryPayment);
+router.post('/verify-retry-payment', isAuthenticated, orderController.verifyRetryPayment);
+router.post('/:orderId/refund', isAuthenticated, orderController.createRefundRequest);
+router.post('/:orderId/cancel', isAuthenticated, orderController.cancelOrder);
 
 module.exports = router;

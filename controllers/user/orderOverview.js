@@ -1,15 +1,21 @@
 const Order = require('../../models/order');
 const Wallet = require('../../models/wallet');
 const User = require('../../models/user');
-const Refund = require('../../models/refund')
-// routes/users.js
+const Refund = require('../../models/refund');
 const express = require('express');
 const router = express.Router();
 const PDFDocument = require('pdfkit');
 const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 const Variant = require('../../models/variant');
+const Razorpay = require('razorpay');
 
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+// Generate invoice for a specific order
 exports.generateInvoice = async (req, res) => {
     try {
         const order = await Order.findOne({ _id: req.params.orderId });
@@ -39,7 +45,7 @@ exports.generateInvoice = async (req, res) => {
         doc.text(`Shipping: $20.00`);
         doc.moveDown();
         
-        // Total
+        // Total amount
         doc.fontSize(14);
         doc.text(`Total Amount: $${(order.price * order.quantity + 20).toFixed(2)}`, { bold: true });
         
@@ -49,81 +55,61 @@ exports.generateInvoice = async (req, res) => {
     }
 };
 
-
-const Razorpay = require('razorpay');
-
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID ,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
-
-
+// Retry payment for a specific order
 exports.retryPayment = async (req, res) => {
-   try {
-    console.log("hi")
-       const order = await Order.findOne({ _id: req.params.orderId });
-       if (!order) return res.status(404).json({ success: false });
+    try {
+        const order = await Order.findOne({ _id: req.params.orderId });
+        if (!order) return res.status(404).json({ success: false });
 
-       console.log(order)
+        const amount = (order.price * order.quantity + 20) * 100; // Amount in paise
+        const razorpayOrder = await razorpay.orders.create({
+            amount,
+            currency: 'INR',
+            receipt: order.orderId,
+            payment_capture: 1
+        });
 
-       const amount = (order.price * order.quantity + 20) * 100;
-       const razorpayOrder = await razorpay.orders.create({
-           amount,
-           currency: 'INR',
-           receipt: order.orderId,
-           payment_capture: 1
-       });
-
-       res.json({
-           success: true,
-           order: razorpayOrder,
-           key_id: process.env.RAZORPAY_KEY_ID
-       });
-
-   } catch (error) {
-       res.status(500).json({ success: false });
-   }
+        res.json({
+            success: true,
+            order: razorpayOrder,
+            key_id: process.env.RAZORPAY_KEY_ID
+        });
+    } catch (error) {
+        res.status(500).json({ success: false });
+    }
 };
 
+// Verify the retry payment
 exports.verifyRetryPayment = async (req, res) => {
-   try {
-       const { razorpay_payment_id, razorpay_order_id, orderId } = req.body;
-       
-       const order = await Order.findOne({ _id: orderId });
-       if (!order) return res.status(404).json({ success: false });
+    try {
+        const { razorpay_payment_id, razorpay_order_id, orderId } = req.body;
+        
+        const order = await Order.findOne({ _id: orderId });
+        if (!order) return res.status(404).json({ success: false });
 
-       const payment = await razorpay.payments.fetch(razorpay_payment_id);
-       
-       if (payment.status === 'captured') {
-           order.status = 'Pending';
-           order.paymentStatus = 'Paid';
-           await order.save();
-           
-           res.json({ success: true });
-       } else {
-           res.status(400).json({ success: false });
-       }
-
-   } catch (error) {
-       res.status(500).json({ success: false });
-   }
+        const payment = await razorpay.payments.fetch(razorpay_payment_id);
+        
+        if (payment.status === 'captured') {
+            order.status = 'Pending';
+            order.paymentStatus = 'Paid';
+            await order.save();
+            
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ success: false });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false });
+    }
 };
 
-
+// Get details of a specific order
 exports.getOrderDetails = async (req, res) => {
     try {
-
-        const order = await Order.findOne({ _id: req.params.orderId })
-            .populate('variant');
-
-        const existence = await Refund.findOne({order: req.params.orderId })
-        console.log(existence)
-
+        const order = await Order.findOne({ _id: req.params.orderId }).populate('variant');
+        const existence = await Refund.findOne({ order: req.params.orderId });
         const isThere = existence ? true : false;
 
-        console.log(isThere)
-
-        
         if (!order) {
             return res.status(404).render('error', {
                 message: 'Order not found'
@@ -145,19 +131,18 @@ exports.getOrderDetails = async (req, res) => {
             }
         ]);
 
-        res.render('../views/pages/user/orderOverview', { order,categoriesWithSubs,isThere });
+        res.render('../views/pages/user/orderOverview', { order, categoriesWithSubs, isThere });
     } catch (error) {
-        console.log(error)
         res.status(500).render('error', {
             message: 'Error fetching order details'
         });
     }
 };
 
+// Create a refund request for a specific order
 exports.createRefundRequest = async (req, res) => {
     try {
-        const session = req.session.userId
-        // Find the order
+        const session = req.session.userId;
         const order = await Order.findOne({ _id: req.params.orderId });
         if (!order) {
             return res.status(404).json({ 
@@ -166,19 +151,17 @@ exports.createRefundRequest = async (req, res) => {
             });
         }
 
-        // Check if a refund request already exists for this order
         const existingRequest = await Refund.findOne({ order: order._id });
         if (existingRequest) {
             return res.status(400).json({
                 success: false,
-                message: 'A refund request already exists for this order cannot request again'
+                message: 'A refund request already exists for this order'
             });
         }
 
-        // Create new refund request
         const refundRequest = new Refund({
             order: order._id,
-            user: session, // Assuming you have user info in req.user
+            user: session,
             amount: order.price * order.quantity,
             reason: req.body.reason,
             status: 'pending'
@@ -186,9 +169,8 @@ exports.createRefundRequest = async (req, res) => {
 
         await refundRequest.save();
  
-        order.previousStatus = order.status
-        order.reasonForRefund = req.body.reason
-        console.log("1",order.reasonForRefund);
+        order.previousStatus = order.status;
+        order.reasonForRefund = req.body.reason;
         order.status = 'Refund Requested';
         await order.save();
 
@@ -196,38 +178,38 @@ exports.createRefundRequest = async (req, res) => {
             success: true, 
             message: 'Refund request submitted successfully'
         });
-
     } catch (error) {
-        console.error('Refund Request Error:', error);
         res.status(500).json({ 
             success: false, 
             message: 'Error submitting refund request'
         });
     }
 };
+
+// Cancel a specific order
 exports.cancelOrder = async (req, res) => {
     try {
-        const order = await Order.findOne({ _id : req.params.orderId });
+        const order = await Order.findOne({ _id: req.params.orderId });
         if (!order) {
             return res.status(404).json({ success: false });
         }
 
-           // Restore inventory quantity
-           const updateQuery = {};
-           updateQuery[`sizes.${order.size}`] = order.quantity;
-   
-           const updatedVariant = await Variant.findByIdAndUpdate(
-               order.variant,
-               { $inc: updateQuery },
-               { new: true, runValidators: true }
-           );
-   
-           if (!updatedVariant) {
-               return res.status(400).json({ 
-                   success: false,
-                   message: 'Failed to restore inventory'
-               });
-           }
+        // Restore inventory quantity
+        const updateQuery = {};
+        updateQuery[`sizes.${order.size}`] = order.quantity;
+
+        const updatedVariant = await Variant.findByIdAndUpdate(
+            order.variant,
+            { $inc: updateQuery },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedVariant) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Failed to restore inventory'
+            });
+        }
 
         order.status = 'Cancelled';
         order.cancellationReason = req.body.reason;

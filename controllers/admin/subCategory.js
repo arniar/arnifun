@@ -77,8 +77,7 @@ exports.searchSubCategories = async (req, res, next) => {
 
 exports.createSubCategory = async (req, res, next) => {
     try {
-        let name = req.body.name;
-        name = name.toLowerCase();
+        let name = req.body.name.toLowerCase();
         const exist = await subCategory.findOne({ subCategoryName: name, mainCategory: req.session.mainCategoryId });
         console.log(exist);
         if (exist) {
@@ -104,8 +103,8 @@ exports.editSubCategory = async (req, res, next) => {
         console.log(req.body);
         let { croppedImage, name, id } = req.body;
         name = name.toLowerCase();
-        const exist = await subCategory.findOne({ subCategoryName: name });
-        console.log (exist);
+        const exist = await subCategory.findOne({ subCategoryName: name, _id: { $ne: id }  });
+        console.log(exist);
         if (exist) {
             return res.send("exists");
         }

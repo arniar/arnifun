@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const salesController = require('../../controllers/admin/sales');
+const authMiddleware = require('../../middlewares/adminLoginCheck');
 
 // Render sales report page
-router.get('/', salesController.renderSalesReport);
+router.get('/', authMiddleware, salesController.renderSalesReport);
 
 // Get sales report data
-router.get('/report', async (req, res) => {
+router.get('/report', authMiddleware, async (req, res) => {
     try {
         const { startDate, endDate } = req.query;
         const salesData = await salesController.getProductSales({ startDate, endDate });
@@ -18,7 +19,7 @@ router.get('/report', async (req, res) => {
 });
 
 // Download sales report
-router.get('/download', async (req, res) => {
+router.get('/download', authMiddleware, async (req, res) => {
     try {
         const { startDate, endDate, format } = req.query;
         
@@ -39,7 +40,7 @@ router.get('/download', async (req, res) => {
 });
 
 // Get period-specific reports
-router.get('/daily', async (req, res) => {
+router.get('/daily', authMiddleware, async (req, res) => {
     try {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -55,12 +56,12 @@ router.get('/daily', async (req, res) => {
     }
 });
 
-router.get('/monthly', async (req, res) => {
+router.get('/monthly', authMiddleware, async (req, res) => {
     try {
         const today = new Date();
         // First day of current month
         const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        // Last day of current month (setting day to 0 of next month gives last day of current month)
+        // Last day of current month
         const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         
         const salesData = await salesController.getProductSales({
@@ -74,7 +75,7 @@ router.get('/monthly', async (req, res) => {
     }
 });
 
-router.get('/yearly', async (req, res) => {
+router.get('/yearly', authMiddleware, async (req, res) => {
     try {
         const today = new Date();
         const startDate = new Date(today.getFullYear(), 0, 1);
@@ -92,7 +93,7 @@ router.get('/yearly', async (req, res) => {
 });
 
 // Custom period report
-router.get('/custom', async (req, res) => {
+router.get('/custom', authMiddleware, async (req, res) => {
     try {
         const { startDate, endDate } = req.query;
         if (!startDate || !endDate) {

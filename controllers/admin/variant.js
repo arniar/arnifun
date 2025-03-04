@@ -51,30 +51,30 @@ const processImages = async (images) => {
   return processedImages;
 };
 
-// GET route to variant
+// GET route to render the variant page
 exports.getVariant = async (req, res, next) => {
-  req.session.productId = req.query.id;
-  res.render('../views/pages/admin/variant');
+  req.session.productId = req.query.id; // Store product ID in session
+  res.render('../views/pages/admin/variant'); // Render the variant page
 };
 
-// GET route to fetch variants
+// GET route to fetch variants for a product
 exports.getVariants = async (req, res, next) => {
   try {
-    const variant = await Variant.find({ productId: req.session.productId });
-    res.json(variant);
+    const variants = await Variant.find({ productId: req.session.productId });
+    res.json(variants); // Return the list of variants
   } catch (error) {
     console.error('Error fetching variants:', error);
     next(error); // Forward error to the next middleware
   }
 };
 
-// POST route to create new variant
+// POST route to create a new variant
 exports.createVariant = async (req, res, next) => {
   try {
     const { color, images, sizes, tags } = req.body;
     const productId = req.session.productId;
 
-    const processedImages = await processImages(images);
+    const processedImages = await processImages(images); // Process images
 
     const variant = new Variant({
       color,
@@ -84,15 +84,15 @@ exports.createVariant = async (req, res, next) => {
       productId
     });
 
-    const savedVariant = await variant.save();
-    res.status(201).json(savedVariant);
+    const savedVariant = await variant.save(); // Save the new variant
+    res.status(201).json(savedVariant); // Return the created variant
   } catch (error) {
     console.error('Error creating variant:', error);
     next(error); // Forward error to the next middleware
   }
 };
 
-// PATCH route to update existing variant
+// PATCH route to update an existing variant
 exports.updateVariant = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -103,7 +103,7 @@ exports.updateVariant = async (req, res, next) => {
       return res.status(404).json({ error: 'Variant not found' });
     }
 
-    const processedImages = await processImages(images);
+    const processedImages = await processImages(images); // Process images
 
     const updatedVariant = await Variant.findByIdAndUpdate(
       id,
@@ -116,14 +116,14 @@ exports.updateVariant = async (req, res, next) => {
       { new: true }
     );
 
-    res.json(updatedVariant);
+    res.json(updatedVariant); // Return the updated variant
   } catch (error) {
     console.error('Error updating variant:', error);
     next(error); // Forward error to the next middleware
   }
 };
 
-// DELETE route to remove variant
+// DELETE route to remove a variant
 exports.deleteVariant = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -133,6 +133,7 @@ exports.deleteVariant = async (req, res, next) => {
       return res.status(404).json({ error: 'Variant not found' });
     }
 
+    // Delete images from Cloudinary
     for (const imageUrl of variant.images) {
       if (isCloudinaryUrl(imageUrl)) {
         const publicId = imageUrl.split('/').pop().split('.')[0];
@@ -140,8 +141,8 @@ exports.deleteVariant = async (req, res, next) => {
       }
     }
 
-    await Variant.findByIdAndDelete(id);
-    res.json({ message: 'Variant deleted successfully' });
+    await Variant.findByIdAndDelete(id); // Delete the variant
+    res.json({ message: 'Variant deleted successfully' }); // Return success message
   } catch (error) {
     console.error('Error deleting variant:', error);
     next(error); // Forward error to the next middleware

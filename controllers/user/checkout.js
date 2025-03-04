@@ -1,4 +1,4 @@
-// controllers/checkoutController.js
+
 const Variant = require('../../models/variant');
 const Cart = require('../../models/cart');
 const Product = require('../../models/product');
@@ -8,12 +8,7 @@ const Order = require('../../models/order');
 const User = require('../../models/user');
 const Wallet = require('../../models/wallet');
 const MainCategory = require('../../models/mainCategory');
-const SubCategory = require('../../models/subCategory');
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
-
-
-
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
@@ -27,39 +22,22 @@ const razorpay = new Razorpay({
 exports.getWalletBalance = async (req, res) => {
     try {
         const userId = req.session.userId;
-        
+
         // Input validation
         if (!userId) {
-            return res.status(401).json({ error: 'User not authenticated' });
+            return res.status(401).json({ error: 'User  not authenticated' });
         }
 
-        // Find or create wallet with proper error handling
+        // Find or create wallet
         let wallet = await Wallet.findOne({ user: userId });
-       
-        
         if (!wallet) {
-            try {
-                wallet = await Wallet.create({
-                    user: userId,
-                    balance: 0,
-                    transactions: [] // Initialize with empty array
-                });
-               
-            } catch (createError) {
-                // Handle potential race condition
-                if (createError.code === 11000) {
-                    wallet = await Wallet.findOne({ user: userId });
-                } else {
-                    throw createError;
-                }
-            }
+            wallet = await Wallet.create({
+                user: userId,
+                balance: 0,
+                transactions: [] // Initialize with empty array
+            });
         }
 
-        
-        if (!wallet) {
-            return res.status(500).json({ error: 'Failed to create or fetch wallet' });
-        }
-      
         return res.json({ balance: wallet.balance });
 
     } catch (error) {
@@ -82,18 +60,18 @@ exports.processWalletPayment = async (req, res) => {
         }
 
         // Find user's wallet
-        const wallet = await Wallet.findOne({ user: req.session.userId });
+        const wallet = await Wallet.findOne({ user: userId });
         if (!wallet) {
             throw new Error('Wallet not found');
         }
-        
+
         // Validate balance
         if (wallet.balance < amount) {
             throw new Error('Insufficient wallet balance');
         }
 
         // Verify cart and stock
-        const cart = await Cart.findOne({ user: req.session.userId });
+        const cart = await Cart.findOne({ user: userId });
         if (!cart || cart.items.length === 0) {
             throw new Error('Cart is empty');
         }
@@ -128,15 +106,12 @@ exports.processWalletPayment = async (req, res) => {
             session: req.session 
         }, res);
 
-     
-
         // Extract only necessary order data
         const orderData = {
             orderId: order._id,
             totalAmount: order.totalAmount,
             status: order.status,
             createdAt: order.createdAt,
-            // Add any other necessary order fields you want to send to the client
         };
 
         // Return success response with simplified order data
@@ -182,17 +157,14 @@ exports.createRazorpayOrder = async (req, res) => {
 
         // Create Razorpay order
         const order = await razorpay.orders.create({
-            amount: Math.round((amount + 20-req.session.discount) * 100), // Adding shipping fee
+            amount: Math.round((amount + 20 - req.session.discount) * 100), // Adding shipping fee
             currency: 'INR',
             receipt: `receipt_${Date.now()}`
         });
 
         // Get user info for prefill
         const user = await User.findOne({ _id: userId });
-        console.log(user)
-
-       
-        req.session.discount=0;
+        req.session.discount = 0; // Reset discount session variable
         res.json({
             order,
             userInfo: {
@@ -201,14 +173,13 @@ exports.createRazorpayOrder = async (req, res) => {
             }
         });
 
-
-
     } catch (error) {
         console.error('Razorpay Order Creation Error:', error);
         res.status(500).json({ error: error.message });
     }
 };
 
+// Verify payment
 exports.verifyPayment = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -221,24 +192,20 @@ exports.verifyPayment = async (req, res) => {
             shippingAddressId
         } = req.body;
 
-        console.log("hi")
-
         // Verify signature
         const body = razorpay_order_id + "|" + razorpay_payment_id;
         const expectedSignature = crypto
-            .createHmac("sha256", 'ComHsrwDysYiQiRkc1gIR91s')
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
             .update(body.toString())
             .digest("hex");
 
         // Check if signature is missing or invalid
         if (!razorpay_signature || expectedSignature !== razorpay_signature) {
-           
-
             const orderResult = await exports.placeOrder({
                 body: {
                     paymentMethod: 'razorpay',
                     shippingAddressId,
-                    paymentStatus:'Failed',
+                    paymentStatus: 'Failed',
                     paymentDetails: {
                         orderId: razorpay_order_id,
                         paymentId: razorpay_payment_id,
@@ -249,7 +216,7 @@ exports.verifyPayment = async (req, res) => {
             }, res, session); // Pass the session to placeOrder
             return res.status(400).json({ paymentStatus: 'failed', error: 'Invalid signature or missing payment details' });
         }
-        console.log("done")
+
         // Process the order
         const orderResult = await exports.placeOrder({
             body: {
@@ -263,8 +230,6 @@ exports.verifyPayment = async (req, res) => {
             },
             session: req.session 
         }, res, session); // Pass the session to placeOrder
-
-        console.log(orderResult)
 
         await session.commitTransaction();
         return res.json(orderResult); // Ensure only one response is sent
@@ -281,15 +246,14 @@ exports.verifyPayment = async (req, res) => {
         session.endSession();
     }
 };
+
 // Checkout Page and Cart Functions
 exports.getCheckoutPage = async (req, res) => {
     try {
         const userId = req.session.userId;
         const cart = await Cart.findOne({ user: userId });
         const wallet = await Wallet.findOne({ user: userId });
-        req.session.discount=req.query.discount || 0;
-        
-        let discount = req.query.discount || 0;
+        req.session.discount = req.query.discount || 0; // Get discount from query
         
         if (!cart) {
             return res.render('../views/pages/user/checkout', { 
@@ -335,10 +299,11 @@ exports.getCheckoutPage = async (req, res) => {
                 }
             }
         ]);
+        
         res.render('../views/pages/user/checkout', { 
             items: cartItems,
             totalAmount: calculateTotal(cartItems),
-            discount,
+            discount: req.session.discount,
             walletBalance: wallet ? wallet.balance : 0,
             categoriesWithSubs 
         });
@@ -351,12 +316,11 @@ exports.getCheckoutPage = async (req, res) => {
 // Address Management Functions
 exports.createAddress = async (req, res) => {
     try {
-        console.log("hi hi")
         const { street, city, state, postalCode, country, phone, name } = req.body;
         const userId = req.session.userId;
 
         const addressCount = await Address.countDocuments({ userId });
-        const isPrimary = addressCount === 0;
+        const isPrimary = addressCount === 0; // Set first address as primary
 
         const address = await Address.create({
             userId,
@@ -429,7 +393,7 @@ exports.deleteAddress = async (req, res) => {
 
 exports.getAllAddresses = async (req, res) => {
     try {
-        const addresses = await Address.find({ userId: req.session.userId})
+        const addresses = await Address.find({ userId: req.session.userId })
             .sort({ isPrimary: -1, createdAt: -1 });
 
         res.json(addresses);
@@ -439,23 +403,16 @@ exports.getAllAddresses = async (req, res) => {
     }
 };
 
-
 exports.placeOrder = async (req, res) => {
     try {
         const { paymentMethod, shippingAddressId, paymentStatus, paymentDetails } = req.body;
         const userId = req.session.userId;
-
-        console.log(req.body);
 
         if (!['cod', 'razorpay', 'wallet'].includes(paymentMethod)) {
             return res.status(400).json({ error: 'Invalid payment method' });
         }
 
         const user = await User.findOne({ _id: userId });
-        console.log("1", user);
-        const _id_ = user.userId;
-        console.log("2", _id_);
-
         const cart = await Cart.findOne({ user: userId });
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ error: 'Cart is empty' });
@@ -471,21 +428,16 @@ exports.placeOrder = async (req, res) => {
         if (cart.couponApplied) {
             const coupon = await Coupon.findOne({ couponCode: cart.couponApplied, status: 'Active' });
             if (coupon && new Date(coupon.validity) > new Date()) {
-                // Calculate total cart value before discount
                 const cartTotal = await calculateCartTotal(cart.items);
-                
-                // Apply coupon if cart meets minimum amount
                 if (cartTotal >= coupon.minAmount) {
                     couponDiscount = coupon.discount;
                 }
             }
         }
 
-        // Calculate discount per product type (not per quantity)
         const numberOfUniqueProducts = cart.items.length;
         const discountPerProductType = numberOfUniqueProducts > 0 ? (couponDiscount / numberOfUniqueProducts) : 0;
         
-        // Create separate orders for each cart item - one at a time
         const orders = [];
         
         for (const cartItem of cart.items) {
@@ -506,10 +458,8 @@ exports.placeOrder = async (req, res) => {
                 throw new Error(`Product not found for variant: ${cartItem.variantId}`);
             }
 
-            // Generate a unique orderId BEFORE creating the order
             const orderId = await Order.generateOrderId();
 
-            // Update variant stock
             const updateQuery = {};
             updateQuery[`sizes.${cartItem.size}`] = -cartItem.quantity;
             
@@ -519,20 +469,14 @@ exports.placeOrder = async (req, res) => {
                 { new: true, runValidators: true }
             );
 
-            if (!updatedVariant) {
-                throw new Error(`Failed to update stock for variant: ${cartItem.variantId}`);
-            }
-
             const variantImage = variant.images?.[0] || product.image;
             const originalPrice = product.discountPrice || product.price;
-            
-            // Apply the coupon discount to the product
             const discountPerUnit = discountPerProductType / cartItem.quantity;
             const priceAfterCoupon = Math.max(0, originalPrice - discountPerUnit);
 
             const orderData = {
-                orderId: orderId, // Use the pre-generated orderId
-                userId: _id_,
+                orderId: orderId,
+                userId: user.userId,
                 name: product.name,
                 image: variantImage,
                 price: priceAfterCoupon,
@@ -615,9 +559,7 @@ function calculateTotal(items) {
     );
 }
 
-
-// Add these functions to your checkoutController.js
-
+// Set primary address
 exports.setPrimaryAddress = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -656,6 +598,7 @@ exports.setPrimaryAddress = async (req, res) => {
     }
 };
 
+// Get primary address
 exports.getPrimaryAddress = async (req, res) => {
     try {
         const userId = req.session.userId;

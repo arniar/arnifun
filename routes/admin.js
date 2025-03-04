@@ -13,22 +13,20 @@ const salesRouter = require('./admin/sales');
 const bannerRouter = require('./admin/banner');
 
 
-// const authMiddleware = require('../middlewares/adminLoginCheck');
+const authMiddleware = require('../middlewares/adminLoginCheck');
 
-// // Apply middleware to all routes
-//  router.use(authMiddleware);
 
-router.use('/dashboard', dashboardRouter);
-router.use('/products', productsRouter);
-router.use('/variant', variantRouter);
-router.use('/maincategories', mainCategoryRouter);
-router.use('/subcategories', subcategoryRouter);
-router.use('/orders', ordersRouter);
-router.use('/coupons', couponRouter);
-router.use('/users', userRouter);
-router.use('/sales', salesRouter);
-router.use('/banner', bannerRouter);
-
+ router.use('/dashboard', authMiddleware, dashboardRouter);
+ router.use('/products', authMiddleware, productsRouter);
+ router.use('/variant', authMiddleware, variantRouter);
+ router.use('/maincategories', authMiddleware, mainCategoryRouter);
+ router.use('/subcategories', authMiddleware, subcategoryRouter);
+ router.use('/orders', authMiddleware, ordersRouter);
+ router.use('/coupons', authMiddleware, couponRouter);
+ router.use('/users', authMiddleware, userRouter);
+ router.use('/sales', authMiddleware, salesRouter);
+ router.use('/banner', authMiddleware, bannerRouter);
+ 
 
 router.post('/logout', async (req, res) => {
     try {

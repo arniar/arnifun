@@ -1,15 +1,13 @@
-// controllers/user/wishlist.js
 const Wishlist = require('../../models/wishlist');
 const Product = require('../../models/product');
 const Variant = require('../../models/variant');
 const MainCategory = require('../../models/mainCategory');
-const SubCategory = require('../../models/subCategory');
 const mongoose = require('mongoose');
 
-
+// GET user's wishlist
 exports.getWishlist = async (req, res) => {
     try {
-
+        // Get all active categories with their subcategories for the hover menu
         const categoriesWithSubs = await MainCategory.aggregate([
             {
                 $match: { status: 'active' }
@@ -24,6 +22,7 @@ exports.getWishlist = async (req, res) => {
                 }
             }
         ]);
+
         // Find wishlist and populate variant and product details
         const wishlist = await Wishlist.findOne({ user: req.session.userId })
             .populate({
@@ -44,7 +43,6 @@ exports.getWishlist = async (req, res) => {
             });
         }
 
-       
         // Transform wishlist items for the view
         const wishlistItems = wishlist.items.map(item => ({
             variantId: item.variantId,
@@ -73,6 +71,7 @@ exports.getWishlist = async (req, res) => {
     }
 };
 
+// Add item to wishlist
 exports.addToWishlist = async (req, res) => {
     try {
         const { variantId, size } = req.body;
@@ -132,6 +131,7 @@ exports.addToWishlist = async (req, res) => {
     }
 };
 
+// Remove item from wishlist
 exports.removeWishlistItem = async (req, res) => {
     try {
         const { variantId } = req.params;
@@ -156,9 +156,8 @@ exports.removeWishlistItem = async (req, res) => {
 
         // Remove item
         const initialLength = wishlist.items.length;
-        wishlist.items = wishlist.items.filter(
-            item => item.variantId.toString() !== variantId
-        );
+        wishlist.items = wishlist.items.filter(item => 
+            item.variantId.toString() !== variantId );
 
         if (wishlist.items.length === initialLength) {
             return res.status(404).json({
@@ -184,6 +183,7 @@ exports.removeWishlistItem = async (req, res) => {
     }
 };
 
+// Toggle item in wishlist
 exports.toggleWishlistItem = async (req, res) => {
     try {
         const { variantId, size, action } = req.body;
@@ -230,6 +230,7 @@ exports.toggleWishlistItem = async (req, res) => {
     }
 };
 
+// Check if item is in wishlist
 exports.checkWishlistItem = async (req, res) => {
     try {
         const { variantId } = req.params;
@@ -263,6 +264,7 @@ exports.checkWishlistItem = async (req, res) => {
     }
 };
 
+// Get product details by variant ID
 exports.getProductDetails = async (req, res) => {
     try {
         const { variantId } = req.params;
@@ -306,6 +308,7 @@ exports.getProductDetails = async (req, res) => {
     }
 };
 
+// Get the count of items in the user's wishlist
 module.exports.getWishlistCount = async (userId) => {
     try {
         const wishlist = await Wishlist.findOne({ user: userId });

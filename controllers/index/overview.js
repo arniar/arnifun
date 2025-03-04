@@ -4,8 +4,10 @@ const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 const mongoose = require('mongoose');
 
+// GET variant with product details
 const getVariantWithProductDetails = async (req, res) => {
     try {
+        // Fetch the variant by ID and join with product details
         const variantData = await Variant.aggregate([
             {
                 $match: {
@@ -23,7 +25,7 @@ const getVariantWithProductDetails = async (req, res) => {
         ]);
 
         if (!variantData || variantData.length === 0) {
-            return res.status(404).send('Variant not found');
+            return res.status(404).send('Variant not found'); // Handle case where variant is not found
         }
 
         const currentVariant = variantData[0];
@@ -46,7 +48,7 @@ const getVariantWithProductDetails = async (req, res) => {
             }
         ]);
 
-        // Get related products through variants and subcategory (assuming you have category)
+        // Get related products through variants and subcategory
         const relatedProducts = await Variant.aggregate([
             {
                 $lookup: {
@@ -74,12 +76,11 @@ const getVariantWithProductDetails = async (req, res) => {
                     productDetails: 1,
                 }
             },
-            {$limit:6}
+            { $limit: 6 } // Limit the number of related products
         ]);
-      console.log(relatedProducts)
 
-      const authentication = req.session.isAuthenticated;
-      
+        const authentication = req.session.isAuthenticated;
+
         // Get all categories with subcategories for hover menu
         const categoriesWithSubs = await MainCategory.aggregate([
             {
@@ -108,12 +109,14 @@ const getVariantWithProductDetails = async (req, res) => {
 
     } catch (error) {
         console.error('Error fetching variant with product details:', error);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error'); // Handle server error
     }
 };
 
+// GET variant data
 const getVariantData = async (req, res) => {
     try {
+        // Fetch the variant by ID and join with product details
         const variantData = await Variant.aggregate([
             {
                 $match: {
@@ -131,12 +134,12 @@ const getVariantData = async (req, res) => {
         ]);
 
         if (!variantData || variantData.length === 0) {
-            return res.status(404).json({ error: 'Variant not found' });
+            return res.status(404).json({ error: 'Variant not found' }); // Handle case where variant is not found
         }
 
-        res.json(variantData[0]);
+        res.json(variantData[0]); // Return the variant data as JSON
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' }); // Handle server error
     }
 };
 

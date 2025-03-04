@@ -1,25 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../../controllers/admin/products');
-
-
+const authMiddleware = require('../../middlewares/adminLoginCheck');
 
 // Main routes
-router.get('/', productController.getHomePage);
-router.post('/table', productController.getProductsTable);
+router.get('/', authMiddleware, productController.getHomePage);
+router.post('/table', authMiddleware, productController.getProductsTable);
 
 // Product management routes
-router.get('/addProduct', productController.getAddProductPage);
-router.post('/addProduct', productController.addProduct);
+router.get('/addProduct', authMiddleware, productController.getAddProductPage);
+router.post('/addProduct', authMiddleware, productController.addProduct);
 
-
-router.post('/edit', productController.editProduct);
+router.post('/edit', authMiddleware, productController.editProduct);
 
 // Delete route
-router.delete('/delete', productController.deleteProduct);
+router.delete('/delete', authMiddleware, productController.deleteProduct);
 
 // Status management routes
-router.patch('/inactivate', productController.inactivateProduct);
-router.patch('/activate', productController.activateProduct);
+router.patch('/inactivate', authMiddleware, productController.inactivateProduct);
+router.patch('/activate', authMiddleware, productController.activateProduct);
 
 module.exports = router;

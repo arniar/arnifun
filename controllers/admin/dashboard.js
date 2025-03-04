@@ -5,6 +5,7 @@ const User = require('../../models/user');
 const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 
+// Render the admin dashboard with statistics and data
 exports.getDashboard = async (req, res) => {
     try {
         const [stats, mostSoldItems, topCategories, count] = await Promise.all([
@@ -31,6 +32,7 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
+// Fetch dashboard statistics
 async function getDashboardStats() {
     try {
         const [totalSalesAgg, totalProducts, totalCustomers, totalOrders] = await Promise.all([
@@ -60,6 +62,7 @@ async function getDashboardStats() {
     }
 }
 
+// Get the top categories based on sales
 async function getTopCategories() {
     try {
         const categories = await MainCategory.aggregate([
@@ -122,6 +125,7 @@ async function getTopCategories() {
     }
 }
 
+// Get the most sold items
 async function getMostSoldItems() {
     try {
         const mostSold = await Order.aggregate([
@@ -172,6 +176,7 @@ async function getMostSoldItems() {
     }
 }
 
+// Get sales chart data based on timeframe
 async function getSalesChartData(timeframe = 'month') {
     try {
         const groupBy = {
@@ -210,6 +215,7 @@ async function getSalesChartData(timeframe = 'month') {
     }
 }
 
+// API endpoint to get dashboard statistics
 exports.getDashboardStats = async (req, res) => {
     try {
         const stats = await getDashboardStats();
@@ -220,6 +226,7 @@ exports.getDashboardStats = async (req, res) => {
     }
 };
 
+// API endpoint to get sales chart data
 exports.getSalesChartData = async (req, res) => {
     try {
         const timeframe = req.query.timeframe || 'month';
@@ -231,16 +238,15 @@ exports.getSalesChartData = async (req, res) => {
     }
 };
 
+// API endpoint to get top categories based on sales
 exports.getTopCategories = async (req, res) => {
     try {
         const categories = await Order.aggregate([
-            // Match only delivered and paid orders
             { 
                 $match: { 
                     status: 'Delivered',
                 }
             },
-            // Lookup product details
             {
                 $lookup: {
                     from: 'products',
@@ -249,9 +255,7 @@ exports.getTopCategories = async (req, res) => {
                     as: 'product'
                 }
             },
-            // Unwind product array
             { $unwind: '$product' },
-            // Lookup subcategory details
             {
                 $lookup: {
                     from: 'subcategories',
@@ -260,9 +264,7 @@ exports.getTopCategories = async (req, res) => {
                     as: 'subCategory'
                 }
             },
-            // Unwind subcategory array
             { $unwind: '$subCategory' },
-            // Lookup main category details
             {
                 $lookup: {
                     from: 'maincategories',
@@ -271,15 +273,12 @@ exports.getTopCategories = async (req, res) => {
                     as: 'mainCategory'
                 }
             },
-            // Unwind main category array
             { $unwind: '$mainCategory' },
-            // Calculate total sales amount
             {
                 $addFields: {
                     salesAmount: { $multiply: ['$price', '$quantity'] }
                 }
             },
-            // Group by main category first
             {
                 $group: {
                     _id: {
@@ -291,7 +290,6 @@ exports.getTopCategories = async (req, res) => {
                     subCategorySales: { $sum: '$salesAmount' }
                 }
             },
-            // Group by main category to aggregate subcategories
             {
                 $group: {
                     _id: {
@@ -307,11 +305,8 @@ exports.getTopCategories = async (req, res) => {
                     }
                 }
             },
-            // Sort by total sales descending
             { $sort: { totalSales: -1 } },
-            // Limit to top 3 categories
             { $limit: 3 },
-            // Final project to format the output
             {
                 $project: {
                     _id: 0,
@@ -337,7 +332,6 @@ exports.getTopCategories = async (req, res) => {
             }
         ]);
 
-        // Calculate percentages for main categories
         const totalSales = categories.reduce((sum, cat) => sum + cat.totalSales, 0);
         const categoriesWithPercentages = categories.map(category => ({
             ...category,
@@ -355,6 +349,7 @@ exports.getTopCategories = async (req, res) => {
     }
 };
 
+// Logout the admin user
 exports.logout = async (req, res) => {
     try {
         req.session.destroy((err) => {

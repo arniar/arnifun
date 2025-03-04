@@ -799,3 +799,47 @@ tr:hover {
         display: block;
     }
 }
+/* Fix for header and scrollbar overlap with sidebar */
+.table-container {
+    position: relative;
+    z-index: 1; /* Lower z-index than sidebar */
+}
+
+th {
+    position: sticky;
+    top: 0;
+    z-index: 2; /* Higher than table but lower than sidebar */
+}
+
+.sidebar {
+    z-index: 100; /* Ensure sidebar is above table elements */
+}
+
+/* Adjust the main content to prevent overlap */
+@media screen and (min-width: 769px) {
+    .main-content {
+        margin-left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+    }
+    
+    .main-content.collapsed {
+        margin-left: var(--sidebar-width-small);
+        width: calc(100% - var(--sidebar-width-small));
+    }
+}
+
+/* Fix scrollbar position */
+::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 6px;
+    border: 3px solid var(--scrollbar-track);
+}

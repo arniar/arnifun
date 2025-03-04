@@ -29,7 +29,7 @@ const bannerSchema = new mongoose.Schema({
     },
     categoryType: {
         type: String,
-        enum: ['MainCategory', 'SubCategory'], // Change these to match actual model names
+        enum: ['MainCategory', 'SubCategory'], 
         required: true
     },
     categoryId: {

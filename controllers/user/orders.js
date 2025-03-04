@@ -1,12 +1,9 @@
-// controllers/user/orders.js
 const Order = require('../../models/order');
 const mongoose = require('mongoose');
-const ObjectId = mongoose.Types.ObjectId;
 const User = require('../../models/user');
 const MainCategory = require('../../models/mainCategory');
-const SubCategory = require('../../models/subCategory');
 
-
+// GET all orders for the user
 exports.getAllOrders = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -29,21 +26,23 @@ exports.getAllOrders = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-            const categoriesWithSubs = await MainCategory.aggregate([
-                {
-                    $match: { status: 'active' }
-                },
-                {
-                    $lookup: {
-                        from: 'subcategories',
-                        localField: '_id',
-                        foreignField: 'mainCategory',
-                        pipeline: [{ $match: { status: 'active' } }],
-                        as: 'subcategories'
-                    }
+        // Get categories with subcategories for the hover menu
+        const categoriesWithSubs = await MainCategory.aggregate([
+            {
+                $match: { status: 'active' }
+            },
+            {
+                $lookup: {
+                    from: 'subcategories',
+                    localField: '_id',
+                    foreignField: 'mainCategory',
+                    pipeline: [{ $match: { status: 'active' } }],
+                    as: 'subcategories'
                 }
-            ]);
+            }
+        ]);
 
+        // Render the orders page with the fetched data
         res.render('../views/pages/user/orders', {
             user: userId,
             orders: orders,
@@ -57,11 +56,11 @@ exports.getAllOrders = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching orders:', error);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error'); // Handle server error
     }
 };
 
-// Rest of your controller methods remain the same
+// GET order details
 exports.getOrderDetails = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -74,16 +73,17 @@ exports.getOrderDetails = async (req, res) => {
         }).populate('variant');
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+            return res.status(404).json({ message: 'Order not found' }); // Handle not found error
         }
 
-        res.json(order);
+        res.json(order); // Return order details as JSON
     } catch (error) {
         console.error('Error fetching order details:', error);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error'); // Handle server error
     }
 };
 
+// Cancel an order
 exports.cancelOrder = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -96,19 +96,19 @@ exports.cancelOrder = async (req, res) => {
         });
 
         if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+            return res.status(404).json({ message: 'Order not found' }); // Handle not found error
         }
 
         if (order.status === 'Delivered' || order.status === 'Cancelled') {
-            return res.status(400).json({ message: 'Order cannot be cancelled' });
+            return res.status(400).json({ message: 'Order cannot be cancelled' }); // Handle cancellation error
         }
 
-        order.status = 'Cancelled';
+        order.status = 'Cancelled'; // Update order status
         await order.save();
 
-        res.json({ message: 'Order cancelled successfully' });
+        res.json({ message: 'Order cancelled successfully' }); // Return success response
     } catch (error) {
         console.error('Error cancelling order:', error);
-        res.status(500).send('Server error');
+        res.status(500).send('Server error'); // Handle server error
     }
 };

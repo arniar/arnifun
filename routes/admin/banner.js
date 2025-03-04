@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const bannerController = require('../../controllers/admin/banner');
+const authMiddleware = require('../../middlewares/adminLoginCheck');
 
-
-router.get('/', bannerController.getBannerManager);
-router.get('/banners', bannerController.getBanners);
-router.post('/banners', bannerController.createBanner);
-router.put('/banners/:id', bannerController.updateBanner);
-router.delete('/banners/:id', bannerController.deleteBanner);
-router.put('/banner/order', bannerController.updateOrder);
-router.patch('/banner/:id/toggle', bannerController.toggleBannerStatus);
-
+router.get('/', authMiddleware, bannerController.getBannerManager);
+router.get('/banners', authMiddleware, bannerController.getBanners);
+router.post('/banners', authMiddleware, bannerController.createBanner);
+router.put('/banners/:id', authMiddleware, bannerController.updateBanner);
+router.delete('/banners/:id', authMiddleware, bannerController.deleteBanner);
+router.put('/banners/order', authMiddleware, bannerController.updateOrder);
+router.patch('/banners/:id/toggle', authMiddleware, bannerController.toggleBannerStatus);
 
 module.exports = router;

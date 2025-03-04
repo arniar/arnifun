@@ -1,11 +1,12 @@
 // controllers/couponController.js
 const Coupon = require('../../models/coupon');
 
+// Add a new coupon
 exports.addCoupon = async (req, res) => {
     try {
         const { couponName, couponCode, discount, minAmount, validity } = req.body;
         
-        // Validate discount is not more than 1/4 of minimum amount
+        // Validate that discount does not exceed 25% of minimum amount
         if (discount > (minAmount / 4)) {
             return res.status(400).json({
                 success: false,
@@ -13,6 +14,7 @@ exports.addCoupon = async (req, res) => {
             });
         }
 
+        // Check for existing coupon with the same code
         const existingCoupon = await Coupon.findOne({ couponCode });
         if (existingCoupon) {
             return res.status(400).json({
@@ -21,6 +23,7 @@ exports.addCoupon = async (req, res) => {
             });
         }
 
+        // Create a new coupon
         const newCoupon = new Coupon({
             couponName,
             couponCode: couponCode.toUpperCase(),
@@ -45,6 +48,7 @@ exports.addCoupon = async (req, res) => {
     }
 };
 
+// Get a specific coupon by ID
 exports.getCoupon = async (req, res) => {
     try {
         const coupon = await Coupon.findById(req.params.id);
@@ -69,10 +73,9 @@ exports.getCoupon = async (req, res) => {
     }
 };
 
-// Modified getCoupons to handle filters
+// Get a list of coupons with optional filters
 exports.getCoupons = async (req, res) => {
     try {
-        console.log("hi")
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -91,7 +94,6 @@ exports.getCoupons = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-            console.log('hi',coupons)
         res.json({
             success: true,
             coupons,
@@ -108,10 +110,12 @@ exports.getCoupons = async (req, res) => {
     }
 };
 
+// Update an existing coupon
 exports.updateCoupon = async (req, res) => {
     try {
         const { couponName, couponCode, discount, minAmount, validity } = req.body;
 
+        // Validate that discount does not exceed 25% of minimum amount
         if (discount > (minAmount / 4)) {
             return res.status(400).json({
                 success: false,
@@ -119,6 +123,7 @@ exports.updateCoupon = async (req, res) => {
             });
         }
 
+        // Check for existing coupon with the same code, excluding the current coupon
         const existingCoupon = await Coupon.findOne({
             couponCode,
             _id: { $ne: req.params.id }
@@ -131,6 +136,7 @@ exports.updateCoupon = async (req, res) => {
             });
         }
 
+        // Update the coupon
         const updatedCoupon = await Coupon.findByIdAndUpdate(
             req.params.id,
             {
@@ -165,6 +171,7 @@ exports.updateCoupon = async (req, res) => {
     }
 };
 
+// Delete a coupon by ID
 exports.deleteCoupon = async (req, res) => {
     try {
         const deletedCoupon = await Coupon.findByIdAndDelete(req.params.id);

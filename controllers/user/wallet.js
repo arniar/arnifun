@@ -2,15 +2,12 @@ const Wallet = require('../../models/wallet');
 const MainCategory = require('../../models/mainCategory');
 const SubCategory = require('../../models/subCategory');
 
-
 const walletController = {
-
-   
-    // Get wallet page with transactions
+    // GET wallet page with transactions
     getWallet: async (req, res) => {
         try {
+            // Find or create a wallet for the user
             let wallet = await Wallet.findOne({ user: req.session.userId });
-            
             if (!wallet) {
                 wallet = await Wallet.create({
                     user: req.session.userId,
@@ -18,6 +15,8 @@ const walletController = {
                     transactions: []
                 });
             }
+
+            // Get all active categories with their subcategories for the hover menu
             const categoriesWithSubs = await MainCategory.aggregate([
                 {
                     $match: { status: 'active' }
@@ -32,30 +31,30 @@ const walletController = {
                     }
                 }
             ]);
-    
+
             // Only keep the last 10 transactions
             wallet.transactions = wallet.transactions.slice(-10);
-    
-            res.render('../views/pages/user/wallet', { wallet,categoriesWithSubs});
+
+            // Render the wallet page with wallet information and categories
+            res.render('../views/pages/user/wallet', { wallet, categoriesWithSubs });
         } catch (error) {
             console.error('Error fetching wallet:', error);
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ message: 'Internal server error' }); // Handle server error
         }
     },
     
-    // Get wallet balance
+    // GET wallet balance
     getBalance: async (req, res) => {
         try {
             const wallet = await Wallet.findOne({ user: req.session.userId });
-            
             if (!wallet) {
-                return res.status(404).json({ message: 'Wallet not found' });
+                return res.status(404).json({ message: 'Wallet not found' }); // Handle not found error
             }
 
-            res.json({ balance: wallet.balance });
+            res.json({ balance: wallet.balance }); // Return wallet balance
         } catch (error) {
             console.error('Error fetching balance:', error);
-            res.status(500).json({ message: 'Internal server error' });
+            res.status(500).json({ message: 'Internal server error' }); // Handle server error
         }
     }
 };
