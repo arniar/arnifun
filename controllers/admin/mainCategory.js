@@ -75,7 +75,7 @@ exports.postAdminCategoryCreate = async (req, res, next) => {
     try {
         let name = req.body.name
         name = name.toLowerCase();
-        const exist = await MainCategory.findOne({ mainCategoryName: req.body.name });
+        const exist = await MainCategory.findOne({ mainCategoryName: name });
         if (exist) {
             return res.send("exists");
         }
