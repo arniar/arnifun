@@ -73,13 +73,15 @@ exports.getAdminCategorySearch = async (req, res, next) => {
 // Create a new main category
 exports.postAdminCategoryCreate = async (req, res, next) => {
     try {
+        let name = req.body.name
+        name = name.toLowerCase();
         const exist = await MainCategory.findOne({ mainCategoryName: req.body.name });
         if (exist) {
             return res.send("exists");
         }
 
         const { croppedImage } = req.body;
-        let name = req.body.name.toLowerCase();
+      
 
         if (!croppedImage) {
             return res.status(400).json({ error: 'No image provided in the request body' });
